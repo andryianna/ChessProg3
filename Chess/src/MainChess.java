@@ -60,7 +60,6 @@ public class MainChess extends JFrame {
     private void showNewGame(){
         //Classe Game per creare la scacchiera
         JPanel newgameP = new Game();
-        
 
         JMenuBar menuBar = new JMenuBar();
 
@@ -70,6 +69,8 @@ public class MainChess extends JFrame {
         save.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
+                SaveGame saveGame = new SaveGame("partita.pgn");
+                saveGame.save();
                 showMainMenu();
             }
         });
