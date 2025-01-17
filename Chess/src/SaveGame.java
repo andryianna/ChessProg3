@@ -19,7 +19,7 @@ public class SaveGame {
         content.append("[White \"").append("Player").append("\"]\n");
         content.append("[Black \"").append("Player").append("\"]\n");
         content.append("[Result \"").append(result).append("\"]\n\n");
-        content.append("1. e4 e5 2. Nf3 Nf6 ").append(result);
+        content.append("1. e4 e5 2. Nf3 Nf6 3. Bc4 Nxe4 4. Bxe5+ Kxf7 5. Nxe5+ Kf6 ").append(result);
     }
 
     public void save(){

@@ -1,5 +1,5 @@
-public class Pawn extends Piece {
-    public Pawn(int color, char x, int y) {
+public class Queen extends Piece {
+    public Queen(int color, char x, int y) {
         super(color,x,y);
     }
 
@@ -7,6 +7,4 @@ public class Pawn extends Piece {
     public Boolean isValidMove(char File, int Rank) {
         return null;
     }
-
-
 }

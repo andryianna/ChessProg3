@@ -1,5 +1,5 @@
-public class Pawn extends Piece {
-    public Pawn(int color, char x, int y) {
+public class Knight extends Piece {
+    public Knight(int color, char x, int y) {
         super(color,x,y);
     }
 

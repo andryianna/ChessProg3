@@ -1,4 +1,5 @@
 import java.awt.*;
+import javax.swing.*;
 
 
 public class King extends Piece {
