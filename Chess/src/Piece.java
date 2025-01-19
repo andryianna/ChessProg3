@@ -21,8 +21,16 @@ public abstract class Piece {
         return file;
     }
 
+    public void setFile(char file) {
+        this.file = file;
+    }
+
     public int getRank() {
         return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public abstract Boolean isValidMove(char File, int Rank);

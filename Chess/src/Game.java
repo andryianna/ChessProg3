@@ -1,9 +1,9 @@
+import javax.print.attribute.standard.JobName;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 class Game extends JPanel {
-    private final JPanel[][] square = new JPanel[8][8];
+    private final JButton[][] square = new JButton[8][8];
     private final Piece[][] board = new Piece[8][8];
 
 
@@ -23,7 +23,9 @@ class Game extends JPanel {
         // Genera la scacchiera
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                JPanel cell = new JPanel(new GridBagLayout());
+                JButton cell = new JButton ();
+                cell.setFocusPainted(false);
+                cell.setBorderPainted(false);
                 if ((row + col) % 2 == 0) {
                     cell.setBackground(lightColor);
                 } else {

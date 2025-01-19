@@ -7,6 +7,4 @@ public class Pawn extends Piece {
     public Boolean isValidMove(char File, int Rank) {
         return null;
     }
-
-
 }

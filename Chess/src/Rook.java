@@ -3,6 +3,12 @@ public class Rook extends Piece {
         super(color,x,y);
     }
 
+    private Boolean hasMoved = false;
+
+    protected Boolean hasMoved() {
+        return hasMoved;
+    }
+
     @Override
     public Boolean isValidMove(char File, int Rank) {
         return null;
