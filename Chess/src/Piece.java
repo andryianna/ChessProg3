@@ -9,6 +9,7 @@ public abstract class Piece {
         this.rank = y;
     }
 
+
     public int getColor() {
         return color;
     }

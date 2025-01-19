@@ -1,11 +1,13 @@
-import javax.print.attribute.standard.JobName;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 class Game extends JPanel {
     private final JButton[][] square = new JButton[8][8];
     private final Piece[][] board = new Piece[8][8];
-
+    private Piece selectedPiece = null;
+    private int selectedCol = -1;
+    private int selectedRow = -1;
 
     public Game() {
 
@@ -31,6 +33,14 @@ class Game extends JPanel {
                 } else {
                     cell.setBackground(darkColor);
                 }
+                final int currentRow = row;
+                final int currentCol = col;
+                cell.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        handleCellClick(currentRow,currentCol);
+                    }
+                });
                 square[row][col] = cell;
                 chessBoard.add(cell);
             }
@@ -89,6 +99,39 @@ class Game extends JPanel {
         revalidate();
         repaint();
     }
+
+    private void handleCellClick(int row, int col) {
+        Piece clickedPiece = board[row][col];
+
+        if (selectedPiece == null) {
+            if (clickedPiece != null) {
+                selectedPiece = clickedPiece;
+                selectedRow = row;
+                selectedCol = col;
+                square[row][col].setBackground(Color.RED);
+            }
+        }
+        else {
+            if (selectedPiece.isValidMove((char) ('a' + col), 8 - row)){
+                board[selectedRow][selectedCol] = null;
+                board[row][col] = selectedPiece;
+                selectedPiece.setFile((char) ('a' + col));
+                selectedPiece.setRank(8 - row);
+                renderPieces();
+            }
+            resetCellColor(selectedRow,selectedCol);
+            selectedPiece = null;
+            selectedRow = -1;
+            selectedCol = -1;
+        }
+    }
+
+    private void resetCellColor(int row, int col) {
+        Color lightColor = new Color(240, 217, 181);
+        Color darkColor = new Color(181, 136, 99);
+        square[row][col].setBackground((row + col) % 2 == 0 ? lightColor : darkColor);
+    }
+
 
     private ImageIcon getPieceIcon(Piece piece) {
         String color = piece.getColor() == 0 ? "white" : "black";
