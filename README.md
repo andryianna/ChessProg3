@@ -21,8 +21,8 @@ Liste di cose da fare
   - Main
   - En Passant
 - Input Mosse
-- Strategia Computer Attacco
-- Strategia Computer Difesa
+- Strategia Computer Attacco Pasqui
+- Strategia Computer Difesa Pasqui
 - Controllare Principio SOLID
 - Verificare Design Pattern
 
