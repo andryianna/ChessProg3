@@ -4,8 +4,15 @@ public class Knight extends Piece {
     }
 
     @Override
-    public Boolean isValidMove(char File, int Rank) {
-        return null;
+    public Boolean isValidMove(char File, int Rank, Piece[][] board) {
+        int fileDiff = Math.abs(File - getFile());
+        int rankDiff = Math.abs(Rank - getRank());
+
+        if ((fileDiff == 2 && rankDiff == 1) || (fileDiff == 1 && rankDiff == 2)){
+            Piece piece = board[Rank - 1][File - 'a'];
+            return piece == null || piece.getColor() != this.getColor();
+        }
+        return false;
     }
 
 

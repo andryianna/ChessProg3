@@ -9,7 +9,6 @@ public abstract class Piece {
         this.rank = y;
     }
 
-
     public int getColor() {
         return color;
     }
@@ -34,5 +33,5 @@ public abstract class Piece {
         this.rank = rank;
     }
 
-    public abstract Boolean isValidMove(char File, int Rank);
+    public abstract Boolean isValidMove(char File, int Rank,Piece[][] board);
 }

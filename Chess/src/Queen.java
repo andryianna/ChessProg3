@@ -4,7 +4,10 @@ public class Queen extends Piece {
     }
 
     @Override
-    public Boolean isValidMove(char File, int Rank) {
-        return null;
+    public Boolean isValidMove(char File, int Rank,Piece[][] board) {
+        /*Rook rook;
+        Bishop bishop;
+        return rook.isValidMove(File,Rank,board) || bishop.isValidMove(File,Rank,board);*/
+        return true;
     }
 }

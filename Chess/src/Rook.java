@@ -10,7 +10,7 @@ public class Rook extends Piece {
     }
 
     @Override
-    public Boolean isValidMove(char File, int Rank) {
+    public Boolean isValidMove(char File, int Rank,Piece[][] board) {
         return null;
     }
 

@@ -2,121 +2,108 @@ public class King extends Piece {
     private Boolean hasMoved = false;
 
     public King(int color, char x, int y) {
-        super(color,x,y);
+        super(color, x, y);
     }
 
     @Override
-    public Boolean isValidMove(char File, int Rank){
+    public Boolean isValidMove(char File, int Rank, Piece[][] board) {
         int newRank = Math.abs(Rank - getRank());
         int newFile = Math.abs(File - getFile());
-        return (newRank <=1 && newFile <=1 && (newRank + newFile > 0));
+
+        if (newRank <= 1 && newFile <= 1 && (newRank + newFile > 0)) {
+            Piece targetPiece = board[Rank - 1][File - 'a'];
+            return targetPiece == null || targetPiece.getColor() != this.getColor();
+        }
+
+        return false;
     }
-    public Boolean isInCheck(Piece[] opponents) {
-        for(Piece p : opponents) {
-            if (p.isValidMove(getFile(),getRank()))
-                return true;
+
+    public Boolean isInCheck(Piece[][] board) {
+        for (Piece[] row : board) {
+            for (Piece p : row) {
+                if (p != null && p.getColor() != getColor() && p.isValidMove(getFile(), getRank(), board)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
-    public Boolean CheckMate(Piece[] opponents, Piece[] pieces) {
-        //Il re non é sotto scacco quindi non é scacco matto
-        if (!isInCheck(opponents))
+    public Boolean CheckMate(Piece[][] board) {
+        if (!isInCheck(board)) {
             return false;
+        }
 
-        //Il re potrebbe muoversi su un altra cella
-        for(int rankDiff = -1; rankDiff <= 1; rankDiff++) {
-            for(int fileDiff = -1; fileDiff <= 1; fileDiff++) {
-                if (rankDiff == 0 && fileDiff == 0)
+        for (int rankDiff = -1; rankDiff <= 1; rankDiff++) {
+            for (int fileDiff = -1; fileDiff <= 1; fileDiff++) {
+                if (rankDiff == 0 && fileDiff == 0) {
                     continue;
+                }
                 int newRank = getRank() + rankDiff;
                 char newFile = (char) (getFile() + fileDiff);
-                if (isValidMove(newFile,newRank)){
-                    boolean isOccupied = false;
-                    for (Piece p : pieces) {
-                        if (p.getRank() == newRank && p.getFile() == newFile && p.getColor() == getColor()) {
-                            isOccupied = true;
-                            break;
+                if (newRank >= 1 && newRank <= 8 && newFile >= 'a' && newFile <= 'h') {
+                    if (isValidMove(newFile, newRank, board)) {
+                        Piece targetPiece = board[newRank - 1][newFile - 'a'];
+                        if (targetPiece == null || targetPiece.getColor() != getColor()) {
+                            Piece[][] simulatedBoard = simulateMove(this, newFile, newRank, board);
+                            if (!isInCheck(simulatedBoard)) {
+                                return false;
+                            }
                         }
                     }
-                    if (!isOccupied)
-                        return false;
                 }
             }
         }
 
-        //Dei pezzi possono bloccare l'attacco
-        for (Piece p : pieces) {
-            if (p.getColor() == getColor() && !(p instanceof King)){
-                for (int rank = 1; rank <= 8; rank++) {
-                    for (char file = 'a'; file <= 'h'; file++) {
-                        if (isValidMove(file,rank)){
-                            Piece[] simulatedMove = simulateMove(p, file, rank, pieces);
-                            if (!isInCheck(getOpponentPieces(simulatedMove)))
-                                return false;
-                        }
-                    }
-                }
-            }
-        }
         return true;
     }
 
-    private Piece[] simulateMove(Piece p, char newFile, int newRank,Piece[] pieces) {
-        Piece[] newboard = new Piece[pieces.length];
-        for (int i = 0; i <= pieces.length; i++) {
-            if (pieces[i] == p) {
-                newboard[i] = p;
-                newboard[i].setRank(newRank);
-                newboard[i].setFile(newFile);
+    private Piece[][] simulateMove(Piece p, char newFile, int newRank, Piece[][] board) {
+        Piece[][] newBoard = new Piece[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                newBoard[i][j] = board[i][j];
             }
-            else
-                newboard[i] = pieces[i];
         }
-        return newboard;
+        newBoard[p.getRank() - 1][p.getFile() - 'a'] = null;
+        p.setRank(newRank);
+        p.setFile(newFile);
+        newBoard[newRank - 1][newFile - 'a'] = p;
+        return newBoard;
     }
 
-    private Piece[] getOpponentPieces(Piece[] pieces) {
-        return java.util.Arrays.stream(pieces)
-                .filter(p -> p.getColor() != getColor())
-                .toArray(Piece[]::new);
-    }
-
-    //Condizioni Arrocco
-    private Boolean isSquareAttacked(char file, int rank, Piece[] oppPieces) {
-        for (Piece p : oppPieces) {
-            if (p.isValidMove(file,rank))
-                return true;
+    private Boolean isSquareAttacked(char file, int rank, Piece[][] board) {
+        for (Piece[] row : board) {
+            for (Piece p : row) {
+                if (p != null && p.getColor() != getColor() && p.isValidMove(file, rank, board)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
-    public Boolean canShortCastle(Piece rook, Piece[] pieces) {
-        if (hasMoved || !(rook instanceof Rook) || ((Rook) rook).hasMoved()){
+    public Boolean canShortCastle(Piece rook, Piece[][] board) {
+        if (hasMoved || !(rook instanceof Rook) || ((Rook) rook).hasMoved()) {
             return false;
         }
 
         int currRank = getRank();
         char kingFile = getFile();
 
-        if (rook.getFile() < kingFile || Math.abs(rook.getFile() - kingFile) != 3){
+        if (rook.getFile() < kingFile || Math.abs(rook.getFile() - kingFile) != 3) {
             return false;
         }
 
-        //Controlla le caselle tra la torre e il re se sono pulite
-        for (char file = (char) (kingFile + 1); file <= rook.getFile(); file++){
-            for (Piece p : pieces) {
-                if (p.getFile() == file && p.getRank() == currRank)
-                    return false;
-                if (isSquareAttacked(file, currRank, pieces)) {
-                    return false;
-                }
+        for (char file = (char) (kingFile + 1); file < rook.getFile(); file++) {
+            if (board[currRank - 1][file - 'a'] != null || isSquareAttacked(file, currRank, board)) {
+                return false;
             }
         }
         return true;
     }
 
-    public Boolean canLongCastle(Piece rook, Piece[] pieces) {
+    public Boolean canLongCastle(Piece rook, Piece[][] board) {
         if (hasMoved || !(rook instanceof Rook) || ((Rook) rook).hasMoved()) {
             return false;
         }
@@ -129,18 +116,11 @@ public class King extends Piece {
             return false;
         }
 
-        // Controlla le caselle tra la torre e il re se sono pulite
         for (char file = (char) (kingFile - 1); file > rookFile; file--) {
-            for (Piece piece : pieces) {
-                if (piece.getFile() == file && piece.getRank() == currentRank) {
-                    return false;
-                }
-                if (isSquareAttacked(file, currentRank, pieces)) {
-                    return false;
-                }
+            if (board[currentRank - 1][file - 'a'] != null || isSquareAttacked(file, currentRank, board)) {
+                return false;
             }
         }
         return true;
     }
 }
-
