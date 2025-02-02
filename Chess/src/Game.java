@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 class Game extends JPanel {
+    private final NewGame newGame;
     private GameState currentGameState;
     private final JButton[][] square = new JButton[8][8];
     private final Piece[][] board = new Piece[8][8];
@@ -17,6 +18,7 @@ class Game extends JPanel {
     private SaveGame saveGame;
 
     public Game() {
+        this.newGame = new NewGame(board,this);
         this.currentGameState = new Idle();
         currentGameState.enterState(this);
         // Layout della scacchiera
@@ -52,7 +54,7 @@ class Game extends JPanel {
         // Aggiungi la scacchiera al pannello principale
         add(chessBoard, BorderLayout.CENTER);
 
-        initPieces();
+        newGame.initPieces();
         renderPieces();
 
         //Aggiungi lista mosse
@@ -63,38 +65,6 @@ class Game extends JPanel {
         saveGame = new SaveGame("partita.pgn");
     }
 
-    private void initPieces() {
-        //Pezzi Bianchi
-        addPiece(new Rook(0, 'a', 1));
-        addPiece(new Knight(0, 'b', 1));
-        addPiece(new Bishop(0, 'c', 1));
-        addPiece(new Queen(0, 'd', 1));
-        addPiece(new King(0, 'e', 1));
-        addPiece(new Bishop(0, 'f', 1));
-        addPiece(new Knight(0, 'g', 1));
-        addPiece(new Rook(0, 'h', 1));
-        for (char i = 'a'; i < 'i'; i++) {
-            addPiece(new Pawn(0, i, 2));
-        }
-        //Pezzi Neri
-        addPiece(new Rook(1, 'a', 8));
-        addPiece(new Knight(1, 'b', 8));
-        addPiece(new Bishop(1, 'c', 8));
-        addPiece(new Queen(1, 'd', 8));
-        addPiece(new King(1, 'e', 8));
-        addPiece(new Bishop(1, 'f', 8));
-        addPiece(new Knight(1, 'g', 8));
-        addPiece(new Rook(1, 'h', 8));
-        for (char i = 'a'; i < 'i'; i++) {
-            addPiece(new Pawn(1, i, 7));
-        }
-    }
-
-    public void addPiece(Piece piece) {
-        int row = 8-piece.getRank();
-        int col = piece.getFile() - 'a';
-        board[row][col] = piece;
-    }
 
     public void renderPieces() {
         for (int row = 0; row < 8; row++) {

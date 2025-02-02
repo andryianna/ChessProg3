@@ -23,7 +23,14 @@ public class SaveGame {
             if (!savedir.exists()) {
                 savedir.mkdirs();
             }
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(savedir + fileName,false))) {
+            if (!(new File(savedir, fileName).exists())) {
+                new File(savedir, fileName).createNewFile();
+            }
+            System.out.println(new File(savedir, fileName).exists());
+            new File(savedir, fileName).setReadable(true,false);
+            new File(savedir, fileName).setWritable(true,false);
+            System.out.println("Saved to " + savedir + "\\"+fileName);
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(savedir + fileName))) {
                 bw.append("[Event \"").append(fileName).append("\"]\n");
                 bw.append("[Site \"").append("localhost").append("\"]\n");
                 bw.append("[Date \"").append(date.toString()).append("\"]\n");
@@ -31,13 +38,16 @@ public class SaveGame {
                 bw.append("[White \"").append("Player").append("\"]\n");
                 bw.append("[Black \"").append("Player").append("\"]\n");
                 bw.append("[Result \"").append("*").append("\"]\n\n");
+                System.out.println(moves.size());
                 for (int i = 0; i < moves.size(); i++) {
+                    System.out.println("Sono qui");
                     if (i % 2 == 0) {
-                        bw.write(((i / 2) + 1) + " ");
+                        bw.append(((i / 2) + 1) + ". ");
                     }
-                    bw.write(moves.get(i) + " ");
+                    bw.append(moves.get(i) + " ");
                 }
                 bw.write("*");
+                System.out.println(new File(fileName).canWrite());
             }
         } catch (Exception e) {
             System.err.println(e);
