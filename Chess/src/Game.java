@@ -14,6 +14,7 @@ class Game extends JPanel {
     private final JTextArea moveLog = new JTextArea(10,30);
     private final List<TurnObserver> observers = new ArrayList<>();
     private boolean isWhiteTurn = true;
+    private SaveGame saveGame;
 
     public Game() {
         this.currentGameState = new Idle();
@@ -58,6 +59,8 @@ class Game extends JPanel {
         moveLog.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(moveLog);
         add(scrollPane, BorderLayout.EAST);
+
+        saveGame = new SaveGame("partita.pgn");
     }
 
     private void initPieces() {
@@ -110,9 +113,11 @@ class Game extends JPanel {
 
     private void handleCellClick(int row, int col) {
         Piece clickedPiece = board[row][col];
-        if (clickedPiece != null && clickedPiece.getColor() != (isWhiteTurn ? 0 : 1)) {
-            JOptionPane.showMessageDialog(this, "Non é il tuo turno!", "Errore", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (!currentGameState.getState().equals("PieceSelected")) {
+            if (clickedPiece != null && clickedPiece.getColor() != (isWhiteTurn ? 0 : 1)) {
+                JOptionPane.showMessageDialog(this, "Non é il tuo turno!", "Errore", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
         currentGameState.handleCellClick(this,row,col);
     }
@@ -147,16 +152,16 @@ class Game extends JPanel {
     }
 
     public void movePiece(Piece clickedPiece, int row, int col) {
-        System.out.println(clickedPiece);
-        String move = getMove(clickedPiece);
+        String move = getMove(clickedPiece,row,col);
         board[selectedRow][selectedCol] = null;
         board[row][col] = clickedPiece;
-        selectedPiece.setFile((char) ('a' + col));
-        selectedPiece.setRank(8 - row);
+        clickedPiece.setFile((char) ('a' + col));
+        clickedPiece.setRank(row);
         renderPieces();
 
         moveHistory.add(move);
         updateMoveLog();
+        saveGame.addMove(move);
 
         if (clickedPiece.getColor() == 0)
             notifyWhite(move);
@@ -167,25 +172,47 @@ class Game extends JPanel {
         renderPieces();
     }
 
-    private String getMove(Piece clickedPiece) {
+    private String getMove(Piece piece,int row,int col) {
+        char file = (char) ('a' + col);
+        int rank = 8 - row;
         String move = "";
-        if (clickedPiece == null ) {
-            if (selectedPiece instanceof Knight)
-                move += "N";
-            if (!(selectedPiece instanceof Pawn) && !(selectedPiece instanceof Knight)) {
-                move = selectedPiece.getClass().getSimpleName().charAt(0) + "";
-            }
-            move += selectedPiece.getSquare();
+
+        // Se il pezzo non è un pedone, aggiunge l'iniziale del pezzo
+        if (!(piece instanceof Pawn)) {
+            move += piece.getClass().getSimpleName().charAt(0);
         }
-        else{
-            if (selectedPiece instanceof Knight) {
-                move += "N";
-            }else if(!(selectedPiece instanceof Pawn) && !(selectedPiece instanceof Knight)){
-                move += selectedPiece.getClass().getSimpleName().charAt(0) + "";
+
+        // Controlla se la mossa è una cattura
+        if (board[row][col] != null) {
+            if (piece instanceof Pawn) {
+                move += piece.getFile(); // Indica la colonna del pedone in caso di cattura
             }
-            move += "x" + clickedPiece.getSquare();
+            move += "x";
         }
+
+        move += file + "" + rank;
+
+        // Controlla se il re avversario è sotto scacco o scacco matto
+        King opponentKing = findKing(isWhiteTurn ? 1 : 0);
+        if (opponentKing.isInCheck(board)) {
+            move += "+";
+            if (opponentKing.CheckMate(board)) {
+                move += "#";
+            }
+        }
+
         return move;
+    }
+
+    private King findKing(int color) {
+        for (Piece[] row : board) {
+            for (Piece p : row) {
+                if (p instanceof King && p.getColor() == color) {
+                    return (King) p;
+                }
+            }
+        }
+        return null;
     }
 
     private void updateMoveLog(){

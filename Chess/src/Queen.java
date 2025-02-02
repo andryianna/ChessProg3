@@ -5,9 +5,14 @@ public class Queen extends Piece {
 
     @Override
     public Boolean isValidMove(char File, int Rank,Piece[][] board) {
-        /*Rook rook;
-        Bishop bishop;
-        return rook.isValidMove(File,Rank,board) || bishop.isValidMove(File,Rank,board);*/
-        return true;
+        int fileDiff = Math.abs(File - getFile());
+        int rankDiff = Math.abs(Rank - getRank());
+        if (fileDiff == rankDiff) {
+            return new Bishop(getColor(),getFile(),getRank()).isPathClear(File,Rank,board);
+        }
+        if (File == getFile() || getRank() == getFile()) {
+            return new Rook(getColor(),getFile(),getRank()).isPathClear(File,Rank,board);
+        }
+        return false;
     }
 }

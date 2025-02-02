@@ -7,6 +7,7 @@ public class Pawn extends Piece {
     public Boolean isValidMove(char File, int Rank,Piece[][] board) {
         int fileDiff = File - getFile();
         int rankDiff = Rank - getRank();
+        int fileInd = File - 'a';
         int dir = getColor() == 0 ? 1 : -1;
 
         //Muovi di una casella
@@ -15,21 +16,21 @@ public class Pawn extends Piece {
         }
 
         if (fileDiff == 0 && rankDiff == dir) {
-            if (board [Rank][File - 'a'] == null || board [Rank][File - 'a'] != null) {
+            if (board [Rank][fileInd] == null || board [Rank][fileInd] != null) {
                 return true;
             }
         }
         //Muovi di due caselle
         if ((fileDiff == 0 && rankDiff == 2 * dir) && (getColor() == 1 && getRank() == 7)
                 || (getColor() == 0 && getRank() == 2)) {
-            if (board[Rank ][File - 'a'] == null &&
+            if (board[Rank - 1][fileInd] == null &&
                     board[getRank() - 1 + dir][getFile() - 'a'] == null)
                 return true;
         }
 
         //Cattura
         if (Math.abs(fileDiff) == 1 && rankDiff == dir) {
-            Piece piece = board[Rank][File - 'a'];
+            Piece piece = board[Rank][fileInd];
             if (piece != null && piece.getColor() != getColor()) {}
                 return true;
         }

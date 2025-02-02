@@ -12,4 +12,8 @@ public class Idle implements GameState {
     public void enterState(Game game) {
         System.out.println("Nessun pezzo selezionato");
     }
+
+    public String getState() {
+        return "Idle";
+    }
 }

@@ -8,4 +8,7 @@ public class GameOver implements GameState{
     public void enterState(Game game) {
         System.out.println("Partita terminata. Nessuna azione consentita.");
     }
+    public String getState(){
+        return "GameOver";
+    }
 }

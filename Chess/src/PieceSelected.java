@@ -16,4 +16,8 @@ public class PieceSelected implements GameState {
     public void enterState(Game game) {
         System.out.println("Attendi mossa");
     }
+
+    public String getState() {
+        return "PieceSelected";
+    }
 }

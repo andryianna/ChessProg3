@@ -8,8 +8,10 @@ public class MainChess extends JFrame {
 
     private JButton newgame;
     private JButton loadgame;
+    private SaveGame saveGame;
 
     public MainChess() {
+        saveGame = new SaveGame("partita.pgn");
         setTitle("Scacchi");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800,600);
@@ -49,6 +51,7 @@ public class MainChess extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e){
                 showLoadGame();
+                saveGame.load();
             }
         });
 
@@ -62,6 +65,7 @@ public class MainChess extends JFrame {
         JPanel newgameP = new Game();
 
         JMenuBar menuBar = new JMenuBar();
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         JMenu filemenu = new JMenu("Partita");
 
@@ -69,7 +73,6 @@ public class MainChess extends JFrame {
         save.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                SaveGame saveGame = new SaveGame("partita.pgn");
                 saveGame.save();
                 showMainMenu();
             }

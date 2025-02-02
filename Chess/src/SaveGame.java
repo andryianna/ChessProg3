@@ -1,52 +1,64 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SaveGame {
-    private String fileName;
-    private StringBuilder content;
-    private String result = "*";
+    private final String fileName;
+    private List<String> moves;
 
     public SaveGame(String name) {
         fileName = name;
-        content = new StringBuilder();
-        content.append("[Event \"").append(name).append("\"]\n");
-        content.append("[Site \"").append("localhost").append("\"]\n");
-        content.append("[Date \"").append(LocalDate.now()).append("\"]\n");
-        content.append("[Round \"").append("?").append("\"]\n");
-        content.append("[White \"").append("Player").append("\"]\n");
-        content.append("[Black \"").append("Player").append("\"]\n");
-        content.append("[Result \"").append(result).append("\"]\n\n");
-        content.append("1. e4 e5 2. Nf3 Nf6 3. Bc4 Nxe4 4. Bxe5+ Kxf7 5. Nxe5+ Kf6 ").append(result);
+        moves = new ArrayList<>();
     }
 
-    public void save(){
-        String appdataPath = System.getenv("LOCALAPPDATA");
-        if(appdataPath == null){
-            System.err.println("Impossibile trovare cartella");
-            return;
-        }
+    public void addMove(String move) {
+        moves.add(move);
+    }
 
-        String foldername = "Chess";
-        File dir = new File(appdataPath + File.separator + foldername);
-        if(!dir.exists()){
-            if(!dir.mkdirs()){
-                System.err.println("Impossibile trovare la cartella di salvataggio");
-                return;
+    public void save() {
+        LocalDate date = LocalDate.now();
+        try {
+            File savedir = new File(System.getenv("LOCALAPPDATA") + "\\Chess\\");
+            if (!savedir.exists()) {
+                savedir.mkdirs();
+            }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(savedir + fileName,false))) {
+                bw.append("[Event \"").append(fileName).append("\"]\n");
+                bw.append("[Site \"").append("localhost").append("\"]\n");
+                bw.append("[Date \"").append(date.toString()).append("\"]\n");
+                bw.append("[Round \"").append("?").append("\"]\n");
+                bw.append("[White \"").append("Player").append("\"]\n");
+                bw.append("[Black \"").append("Player").append("\"]\n");
+                bw.append("[Result \"").append("*").append("\"]\n\n");
+                for (int i = 0; i < moves.size(); i++) {
+                    if (i % 2 == 0) {
+                        bw.write(((i / 2) + 1) + " ");
+                    }
+                    bw.write(moves.get(i) + " ");
+                }
+                bw.write("*");
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+    public List<String> load() {
+        List<String> moves = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null){
+                if (!line.startsWith("[")) {
+                    String[] split = line.split(" ");
+                    for (String move : split)
+                        if (!move.matches("\\d+\\."))
+                            moves.add(move);
+                }
             }
         }
-
-        String filePath = appdataPath + File.separator + foldername + File.separator + fileName;
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
-            bw.write(content.toString());
-            System.out.println("Partita salvata in " + filePath);
+        catch (IOException e) {
+            System.err.println("Errore nel caricamento: " + e);
         }
-        catch (IOException e){
-            System.err.println("Errore nel salvataggio" + e.getMessage());
-        }
-
+        return moves;
     }
 }
