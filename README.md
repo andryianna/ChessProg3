@@ -6,7 +6,6 @@ Liste di cose da fare
   - Salvare Mosse
 - Carica Partita
   - Lista Mosse
-- Grafica pezzi FATTO
 - Movimento Re
   - Main FATTO
   - Arrocco
@@ -20,10 +19,8 @@ Liste di cose da fare
 - Movimento Pedone
   - Main
   - En Passant
-- Input Mosse
 - Strategia Computer Attacco Pasqui
 - Strategia Computer Difesa Pasqui
 - Controllare Principio SOLID
-- Verificare Design Pattern
 
 
