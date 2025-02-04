@@ -130,6 +130,7 @@ class Game extends JPanel {
         renderPieces();
 
         moveHistory.add(move);
+        System.out.println(moveHistory.size());
         updateMoveLog();
         saveGame.addMove(move);
 
@@ -148,9 +149,11 @@ class Game extends JPanel {
         String move = "";
 
         // Se il pezzo non è un pedone, aggiunge l'iniziale del pezzo
-        if (!(piece instanceof Pawn)) {
+        if (!(piece instanceof Pawn) && !(piece instanceof Knight)) {
             move += piece.getClass().getSimpleName().charAt(0);
         }
+        if (piece instanceof Knight)
+            move += "N";
 
         // Controlla se la mossa è una cattura
         if (board[row][col] != null) {
@@ -218,7 +221,7 @@ class Game extends JPanel {
         String path = "res/images/" + color + "/" + type + ".png";
 
         ImageIcon icon = new ImageIcon(path);
-        Image scaled = icon.getImage().getScaledInstance(60, 60, java.awt.Image.SCALE_SMOOTH);
+        Image scaled = icon.getImage().getScaledInstance(60, 60, Image.SCALE_DEFAULT);
         return new ImageIcon(scaled);
     }
 }

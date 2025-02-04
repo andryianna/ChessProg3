@@ -14,6 +14,7 @@ public class SaveGame {
 
     public void addMove(String move) {
         moves.add(move);
+        System.out.println(moves.size());
     }
 
     public void save() {

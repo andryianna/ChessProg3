@@ -4,37 +4,27 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public Boolean isValidMove(char File, int Rank,Piece[][] board) {
-        int fileDiff = File - getFile();
-        int rankDiff = Rank - getRank();
-        int fileInd = File - 'a';
-        int dir = getColor() == 0 ? 1 : -1;
-
-        //Muovi di una casella
-        if (Rank < 1 || Rank > 8 || File < 'a' || File > 'h') {
-                return false;
-        }
-
-        if (fileDiff == 0 && rankDiff == dir) {
-            if (board [Rank][fileInd] == null || board [Rank][fileInd] != null) {
+    public Boolean isValidMove(char File, int Rank, Piece[][] board) {
+        try {
+            int fileIndex = File - 'a';
+            System.out.println(isIstanceofSomething(fileIndex, Rank, board));
+            if (getFile() - File == 0 && Math.abs(getRank() - Rank) == 1 && isIstanceofSomething(fileIndex,Rank,board)) {
                 return true;
             }
-        }
-        //Muovi di due caselle
-        if ((fileDiff == 0 && rankDiff == 2 * dir) && (getColor() == 1 && getRank() == 7)
-                || (getColor() == 0 && getRank() == 2)) {
-            if (board[Rank - 1][fileInd] == null &&
-                    board[getRank() - 1 + dir][getFile() - 'a'] == null)
-                return true;
-        }
 
-        //Cattura
-        if (Math.abs(fileDiff) == 1 && rankDiff == dir) {
-            Piece piece = board[Rank][fileInd];
-            if (piece != null && piece.getColor() != getColor()) {}
-                return true;
+            if ((getColor() == 0 && getRank() == 2) || (getColor() == 1 && getRank() == 7) && (
+                    !(board[fileIndex][Rank] instanceof Pawn) || !(board[fileIndex][Rank] instanceof Knight) || !(board[fileIndex][Rank] instanceof Queen) || !(board[fileIndex][Rank] instanceof King) || !(board[fileIndex][Rank] instanceof Bishop ))) {
+                if (Math.abs(getRank() - Rank) == 2 && Math.abs(getFile() - File) == 0) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return false;
         }
-
         return false;
+    }
+
+    public boolean isIstanceofSomething(int file, int rank, Piece[][] piece) {
+        return piece[file][rank] instanceof Pawn || piece[file][rank] instanceof Knight || piece[file][rank] instanceof Queen || piece[file][rank] instanceof King || piece[file][rank] instanceof Bishop || piece[file][rank] instanceof Rook;
     }
 }
