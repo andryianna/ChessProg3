@@ -1,4 +1,4 @@
-package Pieces;
+import Pieces.*;
 
 public class PieceFactory {
     public static Piece createPiece(String type, String color) {
@@ -9,7 +9,7 @@ public class PieceFactory {
         catch (Exception e) {
             e.getMessage();
         }
-        return switch (type.toLowerCase()){
+         return switch (type.toLowerCase()){
             case "pawn" -> new Pawn(color,image);
             case "knight" -> new Knight(color,image);
             case "bishop" -> new Bishop(color,image);
