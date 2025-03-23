@@ -1,3 +1,5 @@
+package GUI;
+
 import Pieces.*;
 
 public class PieceFactory {
