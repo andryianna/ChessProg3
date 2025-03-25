@@ -3,15 +3,16 @@ package GameState;
 import GUI.Game;
 
 public class PieceSelectedState implements GameState {
-    private int selectedX, selectedY;
+    private int selectedX;
+    private char selectedY;
 
-    public PieceSelectedState(int x, int y) {
+    public PieceSelectedState(int x, char y) {
         this.selectedX = x;
         this.selectedY = y;
     }
 
     @Override
-    public void handleClick(Game game, int x, int y) {
+    public void handleClick(Game game, int x, char y) {
         if (game.isValidMove(selectedX, selectedY, x, y)) {
             game.movePiece(selectedX, selectedY, x, y);
 
@@ -20,11 +21,11 @@ public class PieceSelectedState implements GameState {
             } else if (game.isCheck()) {
                 game.setState(new CheckState());
             } else {
-                game.setState(new NoPieceSelectedState());
+                game.setState(new NoSelectionState());
                 game.getTurnManager().nextTurn(); // Cambia turno
             }
         } else {
-            game.setState(new NoPieceSelectedState()); // Deseleziona
+            game.setState(new NoSelectionState()); // Deseleziona
         }
     }
 }

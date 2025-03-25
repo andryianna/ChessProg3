@@ -1,5 +1,7 @@
 package Pieces;
 
+import GUI.ChessBoard;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -8,10 +10,26 @@ import java.util.Objects;
 public class Queen implements Piece {
     private final String color;
     private final BufferedImage image;
+    private int rank;
+    private char file;
 
-    public Queen(String color, String imagePath) {
+    public Queen(String color,String imagePath,int rank,char file) {
         this.color = color;
         this.image = loadImage(imagePath);
+        this.rank = rank;
+        this.file = file;
+    }
+
+    public void setPosition(int rank, char file) {
+        this.rank = rank;
+        this.file = file;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+    public char getFile() {
+        return file;
     }
 
     private BufferedImage loadImage(String path) {
@@ -29,7 +47,7 @@ public class Queen implements Piece {
     }
 
     @Override
-    public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, Piece[][] board) {
+    public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
         int rankDiff = Math.abs(endRank - startRank);
         int fileDiff = Math.abs(endCol - startCol);
 
@@ -47,7 +65,7 @@ public class Queen implements Piece {
 
         /// Controlla che il percorso sia libero
         while (row != endRank || col != endCol) {
-            if (board[row][col] != null) {
+            if (board.getPiece(row,col) != null) {
                 return false; /// Pezzo intermedio trovato
             }
             row += rowDirection;
@@ -55,7 +73,7 @@ public class Queen implements Piece {
         }
 
         /// Controllo se la destinazione è vuota o contiene un pezzo avversario
-        Piece destinationPiece = board[endRank][endCol];
+        Piece destinationPiece = board.getPiece(endRank,endCol);
         return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
     }
 

@@ -1,5 +1,7 @@
 package Pieces;
 
+import GUI.ChessBoard;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -8,12 +10,28 @@ import java.util.Objects;
 public class King implements Piece {
     private final String color;
     private final BufferedImage image;
+    private int rank;
+    private char file;
     private boolean hasMoved;
 
-    public King(String color, String imagePath) {
+    public King(String color,String imagePath,int rank,char file) {
         this.color = color;
         this.image = loadImage(imagePath);
+        this.rank = rank;
+        this.file = file;
         this.hasMoved = false;
+    }
+
+    public void setPosition(int rank, char file) {
+        this.rank = rank;
+        this.file = file;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+    public char getFile() {
+        return file;
     }
     private BufferedImage loadImage(String path) {
         try {
@@ -34,7 +52,7 @@ public class King implements Piece {
     }
 
     @Override
-    public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, Piece[][] board) {
+    public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
         int rankDiff = Math.abs(endRank - startRank);
         int fileDiff = Math.abs(endCol - startCol);
 
@@ -51,12 +69,12 @@ public class King implements Piece {
         return false;
     }
 
-    private boolean isDestinationValid(int endRank, char endCol, Piece[][] board) {
-        Piece destinationPiece = board[endRank][endCol];
+    private boolean isDestinationValid(int endRank, char endCol, ChessBoard board) {
+        Piece destinationPiece = board.getPiece(endRank, endCol);
         return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
     }
 
-    private boolean isValidCastling(int rank, char startCol, char endCol, Piece[][] board) {
+    private boolean isValidCastling(int rank, char startCol, char endCol, ChessBoard board) {
         /// Determina se è arrocco corto o lungo
         boolean isShortCastle = endCol > startCol;
         char rookCol = isShortCastle ? 'h' : 'a';
@@ -64,14 +82,14 @@ public class King implements Piece {
         char castleCol = isShortCastle ? 'g' : 'c';
 
         /// Controllo se la Torre esiste e non si è mossa
-        Piece rook = board[rank][rookCol];
+        Piece rook = board.getPiece(rank,rookCol);
         if (!(rook instanceof Rook) || ((Rook) rook).hasMovedState()) {
             return false;
         }
 
         /// Controllo se ci sono pezzi tra Re e Torre
         for (char col = (char) (Math.min(startCol, rookCol) + 1); col < Math.max(startCol, rookCol); col++) {
-            if (board[rank][col] != null) {
+            if (board.hasPiece(rank,col)) {
                 return false;
             }
         }
@@ -84,15 +102,17 @@ public class King implements Piece {
         return true;
     }
 
-    private boolean isSquareAttacked(int rank, char file, Piece[][] board) {
+    private boolean isSquareAttacked(int rank, char file, ChessBoard board) {
         // Controllo attacchi di pedoni
         int direction = this.color.equals("white") ? -1 : 1;
-        if (isValidPosition(rank + direction, (char) (file - 1)) && board[rank + direction][file - 1] instanceof Pawn &&
-                !board[rank + direction][file - 1].getColor().equals(this.color)) {
+        int x = rank + direction;
+        char y = (char)( file - 1);
+        if (isValidPosition(rank + direction, (char) (file - 1)) && board.getPiece(x,y) instanceof Pawn &&
+                !board.getPiece(x,y).getColor().equals(this.color)) {
             return true;
         }
-        if (isValidPosition(rank + direction, (char) (file + 1)) && board[rank + direction][file + 1] instanceof Pawn &&
-                !board[rank + direction][file + 1].getColor().equals(this.color)) {
+        if (isValidPosition(x, y) && board.getPiece(x,y) instanceof Pawn &&
+                !board.getPiece(x,y).getColor().equals(this.color)) {
             return true;
         }
 
@@ -103,8 +123,8 @@ public class King implements Piece {
                 if (Math.abs(dr) != Math.abs(df)) {
                     int newRank = rank + dr;
                     char newFile = (char) (file + df);
-                    if (isValidPosition(newRank, newFile) && board[newRank][newFile] instanceof Knight &&
-                            !board[newRank][newFile].getColor().equals(this.color)) {
+                    if (isValidPosition(newRank, newFile) && board.getPiece(newFile, newRank) instanceof Knight &&
+                            !board.getPiece(newFile,newRank).getColor().equals(this.color)) {
                         return true;
                     }
                 }
@@ -122,7 +142,7 @@ public class King implements Piece {
             char f = (char) (file + dir[1]);
 
             while (isValidPosition(r, f)) {
-                Piece p = board[r][f];
+                Piece p = board.getPiece(r,f);
                 if (p != null) {
                     if (!p.getColor().equals(this.color) &&
                             ((p instanceof Rook && (dir[0] == 0 || dir[1] == 0)) ||
@@ -143,8 +163,8 @@ public class King implements Piece {
                 if (dr != 0 || df != 0) {
                     int newRank = rank + dr;
                     char newFile = (char) (file + df);
-                    if (isValidPosition(newRank, newFile) && board[newRank][newFile] instanceof King &&
-                            !board[newRank][newFile].getColor().equals(this.color)) {
+                    if (isValidPosition(newRank, newFile) && board.getPiece(newRank,newFile) instanceof King &&
+                            !board.getPiece(newRank,newFile).getColor().equals(this.color)) {
                         return true;
                     }
                 }
@@ -161,14 +181,14 @@ public class King implements Piece {
         this.hasMoved = true;
     }
 
-    public boolean isKingInCheck(String color, Piece[][] board) {
+    public boolean isKingInCheck(String color, ChessBoard board) {
         /// Trova la posizione del Re
         int kingRank = -1;
         char kingFile = ' ';
 
         for (int r = 0; r < 8; r++) {
             for (char f = 'a'; f <= 'h'; f++) {
-                Piece piece = board[r][f];
+                Piece piece = board.getPiece(r,f);
                 if (piece instanceof King && piece.getColor().equals(color)) {
                     kingRank = r;
                     kingFile = f;
@@ -185,7 +205,7 @@ public class King implements Piece {
         return isSquareAttacked(kingRank, kingFile, board);
     }
 
-    public boolean isCheckmate(String color, Piece[][] board) {
+    public boolean isCheckmate(String color, ChessBoard board) {
         if (!isKingInCheck(color, board)) {
             return false; /// Non è scacco, quindi non può essere scacco matto
         }
@@ -193,21 +213,21 @@ public class King implements Piece {
         /// Scansiona tutti i pezzi del colore dato e prova ogni mossa legale
         for (int r = 0; r < 8; r++) {
             for (char f = 'a'; f <= 'h'; f++) {
-                Piece piece = board[r][f];
+                Piece piece = board.getPiece(r,f);
                 if (piece != null && piece.getColor().equals(color)) {
                     for (int newRank = 0; newRank < 8; newRank++) {
                         for (char newFile = 'a'; newFile <= 'h'; newFile++) {
                             if (piece.isValidMove(r, f, newRank, newFile, board)) {
                                 // Simula la mossa
-                                Piece temp = board[newRank][newFile];
-                                board[newRank][newFile] = piece;
-                                board[r][f] = null;
+                                Piece temp = board.getPiece(newRank,newFile);
+                                board.setPiece(newRank,newFile,piece);
+                                board.setPiece(r,f,null);
 
                                 boolean stillInCheck = isKingInCheck(color, board);
 
                                 /// Ripristina la scacchiera
-                                board[r][f] = piece;
-                                board[newRank][newFile] = temp;
+                                board.setPiece(r,f,piece);
+                                board.setPiece(newRank,newFile,temp);
 
                                 if (!stillInCheck) {
                                     return false; /// Almeno una mossa può salvare il Re

@@ -1,5 +1,7 @@
 package Pieces;
 
+import GUI.ChessBoard;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -8,12 +10,28 @@ import java.util.Objects;
 public class Rook implements Piece {
     private final String color;
     private final BufferedImage image;
+    private int rank;
+    private char file;
     private boolean hasMoved;
 
-    public Rook(String color,String imagePath){
+    public Rook(String color,String imagePath,int rank,char file) {
         this.color = color;
         this.image = loadImage(imagePath);
+        this.rank = rank;
+        this.file = file;
         this.hasMoved = false;
+    }
+
+    public void setPosition(int rank, char file) {
+        this.rank = rank;
+        this.file = file;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+    public char getFile() {
+        return file;
     }
 
     public boolean hasMovedState(){
@@ -39,7 +57,7 @@ public class Rook implements Piece {
     }
 
     @Override
-    public boolean isValidMove(int startRank, char startFile, int endRank, char endCol, Piece[][] board) {
+    public boolean isValidMove(int startRank, char startFile, int endRank, char endCol, ChessBoard board) {
         /// Controllo se la mossa è in linea retta (stessa colonna o stessa riga)
         if (startRank != endRank && startFile != endCol) {
             return false;
@@ -53,7 +71,7 @@ public class Rook implements Piece {
 
         /// Controllo che non ci siano pezzi intermedi
         while (row != endRank || col != endCol) {
-            if (board[row][col] != null) {
+            if (board.getPiece(row,col) != null) {
                 return false; /// Pezzo intermedio trovato
             }
             row += rowDirection;
@@ -61,7 +79,7 @@ public class Rook implements Piece {
         }
 
         /// Controllo se la destinazione è vuota o contiene un pezzo avversario
-        Piece destinationPiece = board[endRank][endCol];
+        Piece destinationPiece = board.getPiece(endRank,endCol);
         return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
     }
 

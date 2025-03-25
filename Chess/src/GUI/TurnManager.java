@@ -30,4 +30,9 @@ public class TurnManager {
     public boolean isWhiteTurn() {
         return isWhiteTurn;
     }
+
+    public String getCurrentTurn() {
+        return isWhiteTurn() ? "white" : "black";
+    }
+
 }
