@@ -47,15 +47,11 @@ public class ChessBoard {
         }
         return null; // Se il re non viene trovato (caso anomalo)
     }
-
-
-
-
-
     public void setupBoard() {
         /// pezzi bianchi
-        for (char file = 97; file <= 104; file++)
-            pieceFactory.createPiece("pawn", "white", 2, file,board);
+        for (char file = 97; file <= 104; file++) {
+            pieceFactory.createPiece("pawn", "white", 2, file, board);
+        }
         pieceFactory.createPiece("rook","white",1,'a',board);
         pieceFactory.createPiece("knight","white",1,'b',board);
         pieceFactory.createPiece("bishop","white",1,'c',board);
@@ -72,11 +68,10 @@ public class ChessBoard {
         pieceFactory.createPiece("rook","black",8,'a',board);
         pieceFactory.createPiece("knight","black",8,'b',board);
         pieceFactory.createPiece("bishop","black",8,'c',board);
-        pieceFactory.createPiece("knight","black",8,'d',board);
-        pieceFactory.createPiece("queen","black",8,'e',board);
-        pieceFactory.createPiece("king","black",8,'f',board);
-        pieceFactory.createPiece("bishop","black",8,'g',board);
-        pieceFactory.createPiece("knight","black",8,'h',board);
-        pieceFactory.createPiece("rook","black",8,'i',board);
+        pieceFactory.createPiece("queen","black",8,'d',board);
+        pieceFactory.createPiece("king","black",8,'e',board);
+        pieceFactory.createPiece("bishop","black",8,'f',board);
+        pieceFactory.createPiece("knight","black",8,'g',board);
+        pieceFactory.createPiece("rook","black",8,'h',board);
     }
 }

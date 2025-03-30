@@ -4,6 +4,7 @@ import GUI.ChessBoard;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -35,7 +36,8 @@ public class King implements Piece {
     }
     private BufferedImage loadImage(String path) {
         try {
-            return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+            File image = new File(path);
+            return ImageIO.read(image);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

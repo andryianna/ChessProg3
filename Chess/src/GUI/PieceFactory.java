@@ -2,14 +2,17 @@ package GUI;
 
 import Pieces.*;
 
+import java.io.File;
+import java.nio.file.*;
+
 public class PieceFactory {
     public static void createPiece(String type, String color,int rank,char file,Piece [][]board) {
-        if (rank < 0 || rank >= board.length || file < 'a' || file >= 'a' + board[0].length) {
-            throw new IllegalArgumentException("Posizione fuori dai limiti: " + rank + file);
+        if (rank <= 0 || rank > board.length || file < 'a' || file >= 'a' + board[0].length) {
+            throw new IllegalArgumentException("Posizione fuori dai limiti: " + type + file + rank);
         }
         String image = "";
         try {
-            image += "images/" + color + "/"+ type.toLowerCase() + ".png";
+            image += "src/images/" + color + "/" + type.toLowerCase() + ".png";
         }
         catch (Exception e) {
             e.getMessage();

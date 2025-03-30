@@ -2,6 +2,8 @@ package Pieces;
 
 import GUI.ChessBoard;
 
+import java.io.File;
+import java.nio.file.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
@@ -36,13 +38,15 @@ public class Pawn implements Piece {
 
     private BufferedImage loadImage(String path) {
         try {
-            System.out.println("Loading image: " + path);
-            return ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-        } catch (IOException e) {
-            System.err.println(e);
+            File image = new File(path);
+            return ImageIO.read(image);
+        } catch (IOException | NullPointerException e) {
+            System.err.println("Error loading image: " + path);
+            e.printStackTrace();
             return null;
         }
     }
+
 
     @Override
     public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
