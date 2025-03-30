@@ -5,16 +5,11 @@ import java.io.File;
 public class ChessBoard {
     private Piece[][] board;
     private final PieceFactory pieceFactory;
-    private String path = "images/" + "white" + "/"+ "pawn" + ".png";
+
 
     public ChessBoard() {
         board = new Piece[8][8];
         pieceFactory = new PieceFactory();
-    }
-
-    public boolean isPathValid(){
-        File file = new File(path);
-        return file.exists();
     }
 
     public boolean hasPiece(int x, int y) {

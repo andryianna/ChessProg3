@@ -1,9 +1,11 @@
 package GUI;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import TurnObserver.*;
 import Pieces.Piece;
@@ -18,6 +20,12 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         turnManager.attach(this);
 
         setTitle("Scacchi");
+        try {
+            setIconImage(ImageIO.read(new File("src/images/white/king.png")));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         setSize(600, 600);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
