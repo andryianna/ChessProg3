@@ -10,13 +10,11 @@ import java.util.Objects;
 
 public class Bishop implements Piece {
     private final String color;
-    private final BufferedImage image;
     private int rank;
     private char file;
 
-    public Bishop(String color,String imagePath,int rank,char file) {
+    public Bishop(String color,int rank,char file) {
         this.color = color;
-        this.image = loadImage(imagePath);
         this.rank = rank;
         this.file = file;
     }
@@ -31,15 +29,6 @@ public class Bishop implements Piece {
     }
     public char getFile() {
         return file;
-    }
-    private BufferedImage loadImage(String path) {
-        try {
-            File image = new File(path);
-            return ImageIO.read(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
     @Override
     public String getColor() {
@@ -75,10 +64,5 @@ public class Bishop implements Piece {
         /// Controllo se la destinazione è vuota o contiene un pezzo avversario
         Piece destinationPiece = board.getPiece(endRank,endCol);
         return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
-    }
-
-    @Override
-    public BufferedImage getImage() {
-        return image;
     }
 }

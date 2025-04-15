@@ -7,14 +7,19 @@ public class Game {
     private GameState state;
     private final TurnManager turnManager;
 
-    public Game() {
-        this.state = new NoSelectionState();
-        this.turnManager = new TurnManager();
-        this.board = new ChessBoard();
+
+    public Game(ChessBoard board, TurnManager turnmanager) {
+        this.board = board;
+        this.state = new NoSelectionState(board);
+        this.turnManager = turnmanager;
     }
 
     public void setState(GameState state) {
         this.state = state;
+    }
+
+    public GameState getState() {
+        return this.state;
     }
 
     public void handleClick(int x, char y) {
@@ -29,17 +34,18 @@ public class Game {
         return board.hasPiece(x, y);
     }
 
-    public boolean isCorrectTurn(int x, int y) {
+    /*public boolean isCorrectTurn(int x, int y) {
         Piece piece = board.getPiece(x, y);
         if (piece == null) return false; // Nessun pezzo sulla casella
 
         // Controlla se il pezzo appartiene al giocatore di turno
         boolean isWhitePiece = piece.getColor().equals("white");
         return isWhitePiece == turnManager.isWhiteTurn();
-    }
+    }*/
 
-    public boolean isValidMove(int fromX, char fromY, int toX, char toY) {
-        Piece piece = board.getPiece(fromX, fromY);
+    public boolean isValidMove(int fromX, char fromY, int toX, char toY,ChessBoard chessBoard) {
+        int indexFromY = fromY - 'a';
+        Piece piece = chessBoard.getPiece(fromX, indexFromY);
         if (piece == null) return false; // Nessun pezzo da muovere
         return piece.isValidMove(fromX, fromY, toX, toY, board);
     }
@@ -54,22 +60,36 @@ public class Game {
         return king != null && king.isCheckmate(turnManager.getCurrentTurn(),board);
     }
 
-    public void movePiece(int fromX, char fromY, int toX, char toY) {
-        if (!isCorrectTurn(fromX, fromY)) {
-            System.out.println("Non è il turno corretto!");
-            return;
-        }
+    public boolean movePiece(int fromX, char fromY, int toX, char toY) {
+        int fromYIndex = fromY - 'a';
+        int toYIndex = toY - 'a';
 
-        if (!isValidMove(fromX, fromY, toX, toY)) {
+        System.out.printf("Tentativo di muovere da %c%d a %c%d\n", fromY, fromX, toY, toX);
+
+        if (!isValidMove(fromX, fromY, toX, toY, board)) {
             System.out.println("Mossa non valida!");
-            return;
+            return false;
         }
 
-        // Sposta il pezzo sulla scacchiera
-        Piece piece = board.getPiece(fromX, fromY);
-        board.setPiece(toX, toY, piece);
-        board.setPiece(fromX, fromY, null); // Rimuove il pezzo dalla vecchia posizione
+        Piece piece = board.getPiece(fromX, fromYIndex);
+        System.out.println("Pezzo selezionato: " + (piece != null ? piece.getClass().getSimpleName() : "null"));
 
-        turnManager.nextTurn(); // Passa il turno all'altro giocatore e notifica gli osservatori
+        board.setPiece(toX, toYIndex, piece);
+        board.setPiece(fromX, fromYIndex, null);
+
+        // Stampa lo stato della board dopo la mossa
+        System.out.println("Stato della board dopo la mossa:");
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board.getPiece(i, j);
+                System.out.print((p != null ? p.getClass().getSimpleName().charAt(0) : '.') + " ");
+            }
+            System.out.println();
+        }
+
+        System.out.println("Mossa valida!");
+        turnManager.nextTurn();
+        return true;
     }
+
 }

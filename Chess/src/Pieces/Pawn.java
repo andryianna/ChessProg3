@@ -11,13 +11,11 @@ import javax.imageio.ImageIO;
 
 public class Pawn implements Piece {
     private final String color;
-    private final BufferedImage image;
     private int rank;
     private char file;
 
-    public Pawn(String color,String imagePath,int rank,char file) {
+    public Pawn(String color,int rank,char file) {
         this.color = color;
-        this.image = loadImage(imagePath);
         this.rank = rank;
         this.file = file;
     }
@@ -35,18 +33,6 @@ public class Pawn implements Piece {
     }
     @Override
     public String getColor() { return color; }
-
-    private BufferedImage loadImage(String path) {
-        try {
-            File image = new File(path);
-            return ImageIO.read(image);
-        } catch (IOException | NullPointerException e) {
-            System.err.println("Error loading image: " + path);
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     @Override
     public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
@@ -88,13 +74,6 @@ public class Pawn implements Piece {
         }
 
         return false;
-    }
-
-
-
-    @Override
-    public BufferedImage getImage() {
-        return image;
     }
 
     /// Metodo per verificare se il pezzo può essere catturato (non deve essere un re)

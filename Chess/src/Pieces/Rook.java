@@ -10,14 +10,12 @@ import java.util.Objects;
 
 public class Rook implements Piece {
     private final String color;
-    private final BufferedImage image;
     private int rank;
     private char file;
     private boolean hasMoved;
 
-    public Rook(String color,String imagePath,int rank,char file) {
+    public Rook(String color,int rank,char file) {
         this.color = color;
-        this.image = loadImage(imagePath);
         this.rank = rank;
         this.file = file;
         this.hasMoved = false;
@@ -41,16 +39,6 @@ public class Rook implements Piece {
 
     public void setMoved(){
         this.hasMoved = true;
-    }
-
-    private BufferedImage loadImage(String path) {
-        try {
-            File image = new File(path);
-            return ImageIO.read(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @Override
@@ -83,10 +71,5 @@ public class Rook implements Piece {
         /// Controllo se la destinazione è vuota o contiene un pezzo avversario
         Piece destinationPiece = board.getPiece(endRank,endCol);
         return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
-    }
-
-    @Override
-    public BufferedImage getImage() {
-        return image;
     }
 }

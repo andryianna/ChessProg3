@@ -10,14 +10,12 @@ import java.util.Objects;
 
 public class King implements Piece {
     private final String color;
-    private final BufferedImage image;
     private int rank;
     private char file;
     private boolean hasMoved;
 
-    public King(String color,String imagePath,int rank,char file) {
+    public King(String color,int rank,char file) {
         this.color = color;
-        this.image = loadImage(imagePath);
         this.rank = rank;
         this.file = file;
         this.hasMoved = false;
@@ -34,23 +32,10 @@ public class King implements Piece {
     public char getFile() {
         return file;
     }
-    private BufferedImage loadImage(String path) {
-        try {
-            File image = new File(path);
-            return ImageIO.read(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
     @Override
     public String getColor() {
         return color;
-    }
-
-    @Override
-    public BufferedImage getImage() {
-        return image;
     }
 
     @Override

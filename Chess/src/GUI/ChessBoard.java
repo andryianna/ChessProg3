@@ -18,7 +18,7 @@ public class ChessBoard {
     }
 
     public Piece getPiece(int x, int y) {
-        if (x < 0 || x >= 8 || y < 0 || y >= 8) return null;
+        if (x + 1 < 0 || x > 8 || y + 1 < 0 || y > 8) return null;
         return board[x][y];
     }
     public void setPiece(int x, int y, Piece piece) {
@@ -45,28 +45,28 @@ public class ChessBoard {
     public void setupBoard() {
         /// pezzi bianchi
         for (char file = 97; file <= 104; file++) {
-            pieceFactory.createPiece("pawn", "white", 2, file, board);
+            pieceFactory.createPiece("pawn", "black", 2, file, board);
         }
-        pieceFactory.createPiece("rook","white",1,'a',board);
-        pieceFactory.createPiece("knight","white",1,'b',board);
-        pieceFactory.createPiece("bishop","white",1,'c',board);
-        pieceFactory.createPiece("queen","white",1,'d',board);
-        pieceFactory.createPiece("king","white",1,'e',board);
-        pieceFactory.createPiece("bishop","white",1,'f',board);
-        pieceFactory.createPiece("knight","white",1,'g',board);
-        pieceFactory.createPiece("rook","white",1,'h',board);
+        pieceFactory.createPiece("rook","black",1,'a',board);
+        pieceFactory.createPiece("knight","black",1,'b',board);
+        pieceFactory.createPiece("bishop","black",1,'c',board);
+        pieceFactory.createPiece("queen","black",1,'d',board);
+        pieceFactory.createPiece("king","black",1,'e',board);
+        pieceFactory.createPiece("bishop","black",1,'f',board);
+        pieceFactory.createPiece("knight","black",1,'g',board);
+        pieceFactory.createPiece("rook","black",1,'h',board);
 
         /// pezzi neri
         for (char file = 97; file <= 104; file++) {
-            pieceFactory.createPiece("pawn", "black", 7, file,board);
+            pieceFactory.createPiece("pawn", "white", 7, file,board);
         }
-        pieceFactory.createPiece("rook","black",8,'a',board);
-        pieceFactory.createPiece("knight","black",8,'b',board);
-        pieceFactory.createPiece("bishop","black",8,'c',board);
-        pieceFactory.createPiece("queen","black",8,'d',board);
-        pieceFactory.createPiece("king","black",8,'e',board);
-        pieceFactory.createPiece("bishop","black",8,'f',board);
-        pieceFactory.createPiece("knight","black",8,'g',board);
-        pieceFactory.createPiece("rook","black",8,'h',board);
+        pieceFactory.createPiece("rook","white",8,'a',board);
+        pieceFactory.createPiece("knight","white",8,'b',board);
+        pieceFactory.createPiece("bishop","white",8,'c',board);
+        pieceFactory.createPiece("queen","white",8,'d',board);
+        pieceFactory.createPiece("king","white",8,'e',board);
+        pieceFactory.createPiece("bishop","white",8,'f',board);
+        pieceFactory.createPiece("knight","white",8,'g',board);
+        pieceFactory.createPiece("rook","white",8,'h',board);
     }
 }
