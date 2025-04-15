@@ -19,6 +19,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
     private final Game game = new Game(chessBoard,turnManager);
     private final JLabel turnLabel;
     private final JButton[][] boardButtons;
+    private String currentTurn = "white";
 
     private int selectedPieceX;
     private char selectedPieceY;
@@ -117,7 +118,13 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         }
     }
 
+    private boolean checkCurrentTurn(Piece selected){
+        if (selected == null) {
+            return false;
+        }
 
+        return selected.getColor().equals(currentTurn);
+    }
 
     private MouseListener listener(int finalRow, int finalCol, JButton button) {
         return new MouseAdapter() {
@@ -125,6 +132,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                /// azioni con il tasto destro del mouse
                 if (SwingUtilities.isRightMouseButton(e)) {
                     if (button.getBackground().equals(Color.RED))
                         button.setBackground(originalColor);
@@ -133,18 +141,18 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                     return;
                 }
 
-                Piece selectedPiece = chessBoard.getPiece(finalRow, finalCol);
+                Piece selectedPiece =  chessBoard.getPiece(finalRow, finalCol);
 
+                /// azioni con il tasto sinistro del mouse
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    if (game.getState() instanceof NoSelectionState) {
-                        if (selectedPiece != null) {
-                            game.setState(new PieceSelectedState(finalRow, (char) finalCol,chessBoard));
+                   // if (selectedPiece != null && !(game.getState() instanceof PieceSelectedState))
+                        if (game.getState() instanceof NoSelectionState && checkCurrentTurn(selectedPiece)) {
+                            game.setState(new PieceSelectedState(finalRow, (char) finalCol, chessBoard));
                             selectedPieceX = finalRow;
                             selectedPieceY = (char) (finalCol + 'a');
                             button.setBackground(Color.YELLOW);
                             System.out.println("Pezzo selezionato a " + selectedPieceY + selectedPieceX);
-                        }
-                    } else if (game.getState() instanceof PieceSelectedState) {
+                        } else if (game.getState() instanceof PieceSelectedState) {
                         if (selectedPieceX == finalRow && selectedPieceY == (char) (finalCol + 'a')) {
                             game.setState(new NoSelectionState(chessBoard));
                             button.setBackground(originalColor);
@@ -168,6 +176,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
     @Override
     public void onTurnChanged(boolean isWhiteTurn) {
         turnLabel.setText(isWhiteTurn ? "Turno del Bianco" : "Turno del Nero");
+        currentTurn = isWhiteTurn ? "white" : "black";
     }
 
     private void setupBoard() {
