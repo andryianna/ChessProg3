@@ -12,30 +12,33 @@ public record Bishop(String color, int rank, char file) implements Piece {
     public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
         int rankDiff = Math.abs(endRank - startRank);
         int fileDiff = Math.abs(endFile - startFile);
+        /// Movimento in diagonale
+        if (rankDiff != fileDiff) return false;
 
-        /// L'alfiere si muove solo in diagonale
-        if (rankDiff != fileDiff) {
-            return false;
-        }
+        int rankDir = Integer.compare(endRank, startRank);
+        int fileDir = Integer.compare(endFile, startFile);
+        Piece destinationPiece = board.getPiece(endRank, endFile - 'a');
+        if (!isPathClear(board,startRank,startFile,rankDir,fileDir,endRank,endFile)) return false;
+        if (destinationPiece != null && destinationPiece.color().equals(this.color())) return false;
 
-        /// Determina la direzione del movimento
-        int rowDirection = Integer.compare(endRank, startRank);  //// +1 verso il basso, -1 verso l'alto
-        int colDirection = Integer.compare(endFile, startFile);    /// +1 verso destra, -1 verso sinistra
-
-        int row = startRank + rowDirection;
-        char col = (char) (startFile + colDirection);
-
-        /// Controlla che il percorso sia libero
-        while (row != endRank && col != endFile) {
-            if (board.getPiece(row, col) != null) {
-                return false; /// Pezzo intermedio trovato
-            }
-            row += rowDirection;
-            col += colDirection;
-        }
-
-        /// Controllo se la destinazione è vuota o contiene un pezzo avversario
-        Piece destinationPiece = board.getPiece(endRank, endFile);
-        return destinationPiece == null || !destinationPiece.color().equals(this.color);
+        return true;
     }
+
+
+    private boolean isPathClear(ChessBoard board, int startRank, char startFile, int rankDir, int fileDir, int endRank, char endFile) {
+        int rank = startRank + rankDir;
+        int file = startFile - 'a' + fileDir;
+        int targetFile = endFile - 'a';
+
+        while (rank != endRank || file != targetFile) {
+            if (board.getPiece(rank, file) != null) {
+                return false;
+            }
+            rank += rankDir;
+            file += fileDir;
+        }
+
+        return true;
+    }
+
 }

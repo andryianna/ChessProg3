@@ -104,12 +104,10 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
     }
 
     public void renderPieces() {
-        System.out.println("Aggiornamento grafico della scacchiera...");
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = chessBoard.getPiece(row, col);
                 if (piece != null) {
-                    System.out.printf("Posizione %c%d: %s\n", (char)('a' + col), row, piece.getClass().getSimpleName());
                     boardButtons[row][col].setIcon(getPieceIcon(piece));
                 } else {
                     boardButtons[row][col].setIcon(null);
@@ -134,6 +132,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
             public void mousePressed(MouseEvent e) {
                 /// azioni con il tasto destro del mouse
                 if (SwingUtilities.isRightMouseButton(e)) {
+                    System.out.println("Chessboard: " + chessBoard);
                     if (button.getBackground().equals(Color.RED))
                         button.setBackground(originalColor);
                     else
@@ -158,7 +157,6 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                             System.out.println("Deselezionato pezzo.");
                         } else if (game.isValidMove(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'),chessBoard)) {
                             if (game.movePiece(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'))) {
-                                System.out.println("Chiamo renderPieces dopo mossa valida");
                                 game.setState(new NoSelectionState(chessBoard));
                                 renderPieces();
                             }

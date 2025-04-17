@@ -64,7 +64,7 @@ public class King implements Piece {
 
         /// Controllo se la Torre esiste e non si è mossa
         Piece rook = board.getPiece(rank,rookCol);
-        if (!(rook instanceof Rook) || ((Rook) rook).hasMovedState()) {
+        if (!(rook instanceof Rook)) {
             return false;
         }
 

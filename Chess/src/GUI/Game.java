@@ -64,28 +64,16 @@ public class Game {
         int fromYIndex = fromY - 'a';
         int toYIndex = toY - 'a';
 
-        System.out.printf("Tentativo di muovere da %c%d a %c%d\n", fromY, fromX, toY, toX);
-
         if (!isValidMove(fromX, fromY, toX, toY, board)) {
             System.out.println("Mossa non valida!");
             return false;
         }
 
         Piece piece = board.getPiece(fromX, fromYIndex);
-        System.out.println("Pezzo selezionato: " + (piece != null ? piece.getClass().getSimpleName() : "null"));
 
         board.setPiece(toX, toYIndex, piece);
         board.setPiece(fromX, fromYIndex, null);
 
-        // Stampa lo stato della board dopo la mossa
-        System.out.println("Stato della board dopo la mossa:");
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Piece p = board.getPiece(i, j);
-                System.out.print((p != null ? p.getClass().getSimpleName().charAt(0) : '.') + " ");
-            }
-            System.out.println();
-        }
 
         System.out.println("Mossa valida!");
         turnManager.nextTurn();

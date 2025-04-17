@@ -2,68 +2,47 @@ package Pieces;
 
 import GUI.ChessBoard;
 
-public class Rook implements Piece {
-    private final String color;
-    private int rank;
-    private char file;
-    private boolean hasMoved;
-
-    public Rook(String color,int rank,char file) {
-        this.color = color;
-        this.rank = rank;
-        this.file = file;
-        this.hasMoved = false;
-    }
-
-    public void setPosition(int rank, char file) {
-        this.rank = rank;
-        this.file = file;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-    public char getFile() {
-        return file;
-    }
-
-    public boolean hasMovedState(){
-        return hasMoved;
-    }
-
-    public void setMoved(){
-        this.hasMoved = true;
-    }
+public record Rook(String color, int rank, char file) implements Piece {
 
     @Override
-    public String color() {
-        return color;
-    }
+    public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
+        boolean sameRank = startRank == endRank;
+        boolean sameFile = startFile == endFile;
 
-    @Override
-    public boolean isValidMove(int startRank, char startFile, int endRank, char endCol, ChessBoard board) {
-        /// Controllo se la mossa è in linea retta (stessa colonna o stessa riga)
-        if (startRank != endRank && startFile != endCol) {
+        /// Movimento in orizzontale o in verticale
+        if (!sameFile && !sameRank) {
             return false;
         }
 
-        int rowDirection = Integer.compare(endRank, startRank); /// 1 se va giù, -1 se va su, 0 se fermo
-        int colDirection = Integer.compare(endCol, startFile);   /// 1 se va a destra, -1 se va a sinistra, 0 se fermo
+        int rankDir = Integer.compare(endRank, startRank);
+        int fileDir = Integer.compare(endFile, startFile);
 
-        int row = startRank + rowDirection;
-        char col = (char) (startFile + colDirection);
+        /// Controlla se il percorso é pulito
+        if (!isPathClear(board,startRank,startFile,rankDir,fileDir,endRank,endFile)) return false;
 
-        /// Controllo che non ci siano pezzi intermedi
-        while (row != endRank || col != endCol) {
-            if (board.getPiece(row,col) != null) {
-                return false; /// Pezzo intermedio trovato
+        /// Se la casella di destinazione é vuota o se é del colore avversario restituisce vero
+        Piece destinationPiece = board.getPiece(endRank, endFile - 'a');
+        if (destinationPiece == null)
+            return true;
+        if (!destinationPiece.color().equals(this.color()))
+            return true;
+        return false;
+    }
+
+    private boolean isPathClear(ChessBoard board, int startRank, char startFile, int rankDir, int fileDir, int endRank, char endFile) {
+        int rank = startRank + rankDir;
+        int file = startFile - 'a' + fileDir;
+        int targetFile = endFile - 'a';
+
+        while (rank != endRank || file != targetFile) {
+            if (board.getPiece(rank, file) != null) {
+                return false;
             }
-            row += rowDirection;
-            col += (char) colDirection;
+            rank += rankDir;
+            file += fileDir;
         }
 
-        /// Controllo se la destinazione è vuota o contiene un pezzo avversario
-        Piece destinationPiece = board.getPiece(endRank,endCol);
-        return destinationPiece == null || !destinationPiece.color().equals(this.color);
+        return true;
     }
+
 }
