@@ -123,7 +123,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
             return false;
         }
 
-        return selected.getColor().equals(currentTurn);
+        return selected.color().equals(currentTurn);
     }
 
     private MouseListener listener(int finalRow, int finalCol, JButton button) {
@@ -145,7 +145,6 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
 
                 /// azioni con il tasto sinistro del mouse
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                   // if (selectedPiece != null && !(game.getState() instanceof PieceSelectedState))
                         if (game.getState() instanceof NoSelectionState && checkCurrentTurn(selectedPiece)) {
                             game.setState(new PieceSelectedState(finalRow, (char) finalCol, chessBoard));
                             selectedPieceX = finalRow;
@@ -185,7 +184,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
     }
 
     private ImageIcon getPieceIcon(Piece piece) {
-        String color = piece.getColor().equals("white") ? "white" : "black";
+        String color = piece.color().equals("white") ? "white" : "black";
         String type = piece.getClass().getSimpleName().toLowerCase();
         String path = "src/images/" + color + "/" + type + ".png";
 

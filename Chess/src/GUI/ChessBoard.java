@@ -1,6 +1,5 @@
 package GUI;
 import Pieces.*;
-import java.io.File;
 
 public class ChessBoard {
     private Piece[][] board;
@@ -35,7 +34,7 @@ public class ChessBoard {
         for (int rank = 0; rank < 8; rank++) {
             for (char file = 'a'; file <= 'h'; file++) {
                 Piece piece = getPiece(rank, file);
-                if (piece instanceof King && piece.getColor().equals(color)) {
+                if (piece instanceof King && piece.color().equals(color)) {
                     return (King) piece;
                 }
             }

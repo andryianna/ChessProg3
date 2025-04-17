@@ -2,43 +2,16 @@ package Pieces;
 
 import GUI.ChessBoard;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-
-public class Bishop implements Piece {
-    private final String color;
-    private int rank;
-    private char file;
-
-    public Bishop(String color,int rank,char file) {
-        this.color = color;
-        this.rank = rank;
-        this.file = file;
-    }
-
-    public void setPosition(int rank, char file) {
-        this.rank = rank;
-        this.file = file;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-    public char getFile() {
-        return file;
-    }
+public record Bishop(String color, int rank, char file) implements Piece {
     @Override
-    public String getColor() {
+    public String color() {
         return color;
     }
 
     @Override
-    public boolean isValidMove(int startRank, char startFile, int endRank, char endCol, ChessBoard board) {
+    public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
         int rankDiff = Math.abs(endRank - startRank);
-        int fileDiff = Math.abs(endCol - startFile);
+        int fileDiff = Math.abs(endFile - startFile);
 
         /// L'alfiere si muove solo in diagonale
         if (rankDiff != fileDiff) {
@@ -47,14 +20,14 @@ public class Bishop implements Piece {
 
         /// Determina la direzione del movimento
         int rowDirection = Integer.compare(endRank, startRank);  //// +1 verso il basso, -1 verso l'alto
-        int colDirection = Integer.compare(endCol, startFile);    /// +1 verso destra, -1 verso sinistra
+        int colDirection = Integer.compare(endFile, startFile);    /// +1 verso destra, -1 verso sinistra
 
         int row = startRank + rowDirection;
         char col = (char) (startFile + colDirection);
 
         /// Controlla che il percorso sia libero
-        while (row != endRank && col != endCol) {
-            if (board.getPiece(row,col) != null) {
+        while (row != endRank && col != endFile) {
+            if (board.getPiece(row, col) != null) {
                 return false; /// Pezzo intermedio trovato
             }
             row += rowDirection;
@@ -62,7 +35,7 @@ public class Bishop implements Piece {
         }
 
         /// Controllo se la destinazione è vuota o contiene un pezzo avversario
-        Piece destinationPiece = board.getPiece(endRank,endCol);
-        return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
+        Piece destinationPiece = board.getPiece(endRank, endFile);
+        return destinationPiece == null || !destinationPiece.color().equals(this.color);
     }
 }

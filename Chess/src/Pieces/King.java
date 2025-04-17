@@ -2,12 +2,6 @@ package Pieces;
 
 import GUI.ChessBoard;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-
 public class King implements Piece {
     private final String color;
     private int rank;
@@ -34,7 +28,7 @@ public class King implements Piece {
     }
 
     @Override
-    public String getColor() {
+    public String color() {
         return color;
     }
 
@@ -58,7 +52,7 @@ public class King implements Piece {
 
     private boolean isDestinationValid(int endRank, char endCol, ChessBoard board) {
         Piece destinationPiece = board.getPiece(endRank, endCol);
-        return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
+        return destinationPiece == null || !destinationPiece.color().equals(this.color);
     }
 
     private boolean isValidCastling(int rank, char startCol, char endCol, ChessBoard board) {
@@ -95,11 +89,11 @@ public class King implements Piece {
         int x = rank + direction;
         char y = (char)( file - 1);
         if (isValidPosition(rank + direction, (char) (file - 1)) && board.getPiece(x,y) instanceof Pawn &&
-                !board.getPiece(x,y).getColor().equals(this.color)) {
+                !board.getPiece(x,y).color().equals(this.color)) {
             return true;
         }
         if (isValidPosition(x, y) && board.getPiece(x,y) instanceof Pawn &&
-                !board.getPiece(x,y).getColor().equals(this.color)) {
+                !board.getPiece(x,y).color().equals(this.color)) {
             return true;
         }
 
@@ -111,7 +105,7 @@ public class King implements Piece {
                     int newRank = rank + dr;
                     char newFile = (char) (file + df);
                     if (isValidPosition(newRank, newFile) && board.getPiece(newFile, newRank) instanceof Knight &&
-                            !board.getPiece(newFile,newRank).getColor().equals(this.color)) {
+                            !board.getPiece(newFile,newRank).color().equals(this.color)) {
                         return true;
                     }
                 }
@@ -131,7 +125,7 @@ public class King implements Piece {
             while (isValidPosition(r, f)) {
                 Piece p = board.getPiece(r,f);
                 if (p != null) {
-                    if (!p.getColor().equals(this.color) &&
+                    if (!p.color().equals(this.color) &&
                             ((p instanceof Rook && (dir[0] == 0 || dir[1] == 0)) ||
                                     (p instanceof Bishop && Math.abs(dir[0]) == Math.abs(dir[1])) ||
                                     (p instanceof Queen))) {
@@ -151,7 +145,7 @@ public class King implements Piece {
                     int newRank = rank + dr;
                     char newFile = (char) (file + df);
                     if (isValidPosition(newRank, newFile) && board.getPiece(newRank,newFile) instanceof King &&
-                            !board.getPiece(newRank,newFile).getColor().equals(this.color)) {
+                            !board.getPiece(newRank,newFile).color().equals(this.color)) {
                         return true;
                     }
                 }
@@ -176,7 +170,7 @@ public class King implements Piece {
         for (int r = 0; r < 8; r++) {
             for (char f = 'a'; f <= 'h'; f++) {
                 Piece piece = board.getPiece(r,f);
-                if (piece instanceof King && piece.getColor().equals(color)) {
+                if (piece instanceof King && piece.color().equals(color)) {
                     kingRank = r;
                     kingFile = f;
                     break;
@@ -201,7 +195,7 @@ public class King implements Piece {
         for (int r = 0; r < 8; r++) {
             for (char f = 'a'; f <= 'h'; f++) {
                 Piece piece = board.getPiece(r,f);
-                if (piece != null && piece.getColor().equals(color)) {
+                if (piece != null && piece.color().equals(color)) {
                     for (int newRank = 0; newRank < 8; newRank++) {
                         for (char newFile = 'a'; newFile <= 'h'; newFile++) {
                             if (piece.isValidMove(r, f, newRank, newFile, board)) {

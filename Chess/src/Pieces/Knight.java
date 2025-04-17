@@ -1,15 +1,11 @@
 package Pieces;
 
 import GUI.ChessBoard;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
-import java.awt.image.BufferedImage;
 
 public class Knight implements Piece {
     private final String color;
-    private int rank;
-    private char file;
+    private final int rank;
+    private final char file;
 
     public Knight(String color,int rank,char file) {
         this.color = color;
@@ -17,20 +13,8 @@ public class Knight implements Piece {
         this.file = file;
     }
 
-    public void setPosition(int rank, char file) {
-        this.rank = rank;
-        this.file = file;
-    }
 
-    public int getRank() {
-        return rank;
-    }
-    public char getFile() {
-        return file;
-    }
-
-    @Override
-    public String getColor() {
+    public String color() {
         return color;
     }
 
@@ -44,9 +28,10 @@ public class Knight implements Piece {
         if (!result) {
             return false;
         }
-        Piece destinationPiece = board.getPiece(endRank, endFile);
+        Piece destinationPiece = board.getPiece(endRank, endFile - 'a');
+
 
         /// Se la casella di destinazione è vuota o ha un pezzo avversario, la mossa è valida
-        return (destinationPiece == null || !destinationPiece.getColor().equals(this.getColor()));
+        return (destinationPiece == null || !destinationPiece.color().equals(this.color()));
     }
 }

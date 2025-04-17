@@ -2,12 +2,6 @@ package Pieces;
 
 import GUI.ChessBoard;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-
 public class Rook implements Piece {
     private final String color;
     private int rank;
@@ -42,7 +36,7 @@ public class Rook implements Piece {
     }
 
     @Override
-    public String getColor() {
+    public String color() {
         return color;
     }
 
@@ -70,6 +64,6 @@ public class Rook implements Piece {
 
         /// Controllo se la destinazione è vuota o contiene un pezzo avversario
         Piece destinationPiece = board.getPiece(endRank,endCol);
-        return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
+        return destinationPiece == null || !destinationPiece.color().equals(this.color);
     }
 }
