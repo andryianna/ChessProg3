@@ -19,17 +19,8 @@ public class PieceSelectedState implements GameState {
     public void handleClick(Game game, int x, char y) {
         if (game.isValidMove(selectedX, selectedY, x, y,chessBoard)) {
             game.movePiece(selectedX, selectedY, x, y);
-
-            if (game.isCheckmate()) {
-                game.setState(new CheckmateState());
-            } else if (game.isCheck()) {
-                game.setState(new CheckState(chessBoard));
-            } else {
-                game.setState(new NoSelectionState(chessBoard));
-                game.getTurnManager().nextTurn(); // Cambia turno
-            }
-        } else {
-            game.setState(new NoSelectionState(chessBoard)); // Deseleziona
+            game.setState(new NoSelectionState(chessBoard));
+            game.getTurnManager().nextTurn();// Deseleziona
         }
     }
 }

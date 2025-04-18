@@ -9,9 +9,9 @@ public record Pawn(String color, int rank, char file) implements Piece {
         int rankDiff = Math.abs(endRank - startRank);
         int fileDiff = Math.abs(endCol - startCol);
         int direction = this.color.equals("white") ? 1 : -1;
-        Piece dest = board.getPiece(endRank, endCol - 'a');
+        Piece dest = board.getPiece(endRank, endCol - 'a') == null ? null : board.getPiece(endRank, endCol - 'a');
         ///movimento standard dei pedoni
-        boolean normalBehav = rankDiff <= 2 || (direction == 1 && startRank == 6) || (direction == -1 && startRank == 1);
+        boolean normalBehav = ((rankDiff <= 2 || (direction == 1 && startRank == 6) || (direction == -1 && startRank == 1)) && fileDiff == 0) && dest == null;
         ///controllo cattura
         boolean captureBehav = rankDiff == 1 && fileDiff == 1 && !dest.color().equals(this.color());
         return normalBehav || captureBehav;

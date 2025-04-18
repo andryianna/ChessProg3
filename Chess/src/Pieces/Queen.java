@@ -10,6 +10,7 @@ public record Queen(String color, int rank, char file) implements Piece {
         boolean sameFile = startFile == endFile;
         int rankDiff = Math.abs(endRank - startRank);
         int fileDiff = Math.abs(endFile - startFile);
+        /// Movimento alfiere
         if (rankDiff == fileDiff) {
 
             return new Bishop(color,rank,file).isValidMove(startRank,startFile,endRank,endFile,board);
@@ -17,7 +18,6 @@ public record Queen(String color, int rank, char file) implements Piece {
 
         /// Movimento torre
         if (sameRank || sameFile){
-
             return new Rook(color,rank,file).isValidMove(startRank,startFile,endRank,endFile,board);
         }
         return false;

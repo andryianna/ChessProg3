@@ -50,15 +50,15 @@ public class Game {
         return piece.isValidMove(fromX, fromY, toX, toY, board);
     }
 
-    public boolean isCheck() {
+    /*public boolean isCheck() {
         King king = board.getKing(turnManager.getCurrentTurn());
         return king != null && king.isKingInCheck(turnManager.getCurrentTurn(), board);
-    }
+    }*/
 
-    public boolean isCheckmate() {
+    /*public boolean isCheckmate() {
         King king = board.getKing(turnManager.getCurrentTurn());
         return king != null && king.isCheckmate(turnManager.getCurrentTurn(),board);
-    }
+    }*/
 
     public boolean movePiece(int fromX, char fromY, int toX, char toY) {
         int fromYIndex = fromY - 'a';
