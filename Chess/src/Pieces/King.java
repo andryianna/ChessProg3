@@ -11,7 +11,7 @@ public record King(String color, int rank, char file) implements Piece {
 
         Piece destinationPiece = board.getPiece(endRank, endCol - 'a');
 
-        /// si muove di una casella in tutte le direzioni
+        /// Si muove di una casella in tutte le direzioni
         return (rankDiff == 1 || fileDiff == 1) && (destinationPiece == null || !destinationPiece.color().equals(this.color()));
 
     }

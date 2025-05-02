@@ -4,13 +4,9 @@ import GUI.ChessBoard;
 
 public class Knight implements Piece {
     private final String color;
-    private final int rank;
-    private final char file;
 
     public Knight(String color,int rank,char file) {
         this.color = color;
-        this.rank = rank;
-        this.file = file;
     }
 
 

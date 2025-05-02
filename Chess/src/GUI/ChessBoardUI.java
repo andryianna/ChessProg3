@@ -17,6 +17,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
     private final ChessBoard chessBoard = new ChessBoard();
     private final TurnManager turnManager = new TurnManager();
     private final Game game = new Game(chessBoard,turnManager);
+    private final GameLog gameLog = new GameLog(game,"log.pgn");
     private final JLabel turnLabel;
     private final JButton[][] boardButtons;
     private String currentTurn = "white";
@@ -26,7 +27,6 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
 
     public ChessBoardUI() {
         turnManager.attach(this);
-
         setTitle("Scacchi");
         try {
             setIconImage(ImageIO.read(new File("src/images/white/king.png")));
@@ -82,13 +82,13 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         }
 
         // Aggiungi bottoni della scacchiera
-        for (int row = 0; row < 8; row++) {
+        for (int row = 0; row < 8; row++) { 
             for (int col = 0; col < 8; col++) {
                 JButton button = new JButton();
                 button.setPreferredSize(new Dimension(60, 60));
                 button.setBackground((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
 
-                button.addMouseListener(listener(row, col,button));
+                button.addMouseListener(listener(selectedPieceX,selectedPieceY,row, col,button));
 
                 boardButtons[row][col] = button;
                 gbc.gridx = col + 1;
@@ -124,9 +124,10 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         return selected.color().equals(currentTurn);
     }
 
-    private MouseListener listener(int finalRow, int finalCol, JButton button) {
+    private MouseListener listener(int selectedX, char selectedY, int finalRow, int finalCol, JButton button) {
         return new MouseAdapter() {
             final Color originalColor = (finalRow + finalCol) % 2 == 0 ? Color.WHITE : Color.GRAY;
+            final int pieceCount = chessBoard.piecesCount();
 
             @Override
             public void mousePressed(MouseEvent e) {
@@ -140,10 +141,13 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                     return;
                 }
 
-                Piece selectedPiece =  chessBoard.getPiece(finalRow, finalCol);
+                Piece selectedPiece =  chessBoard.getPiece(finalRow,(char) finalCol);
+                final Piece currentPiece = chessBoard.getPiece(selectedX, selectedY);
+                System.out.println("Selezionato pezzo " + selectedPiece);
 
                 /// azioni con il tasto sinistro del mouse
                 if (SwingUtilities.isLeftMouseButton(e)) {
+                    System.out.println(game.getState());
                         if (game.getState() instanceof NoSelectionState && checkCurrentTurn(selectedPiece)) {
                             game.setState(new PieceSelectedState(finalRow, (char) finalCol, chessBoard));
                             selectedPieceX = finalRow;
@@ -157,6 +161,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                             System.out.println("Deselezionato pezzo.");
                         } else if (game.isValidMove(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'),chessBoard)) {
                             if (game.movePiece(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'))) {
+                                gameLog.addMove(chessBoard, currentPiece, selectedX, selectedY, finalRow, (char) (finalCol + 'a'), pieceCount);
                                 game.setState(new NoSelectionState(chessBoard));
                                 renderPieces();
                             }

@@ -22,10 +22,6 @@ public class Game {
         return this.state;
     }
 
-    public void handleClick(int x, char y) {
-        state.handleClick(this, x, y);
-    }
-
     public TurnManager getTurnManager() {
         return turnManager;
     }
@@ -34,14 +30,75 @@ public class Game {
         return board.hasPiece(x, y);
     }
 
-    /*public boolean isCorrectTurn(int x, int y) {
-        Piece piece = board.getPiece(x, y);
-        if (piece == null) return false; // Nessun pezzo sulla casella
+    public boolean isInCheck(String color) {
+        int kingRow = -1;
+        int kingCol = -1;
 
-        // Controlla se il pezzo appartiene al giocatore di turno
-        boolean isWhitePiece = piece.getColor().equals("white");
-        return isWhitePiece == turnManager.isWhiteTurn();
-    }*/
+        // Trova il re
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board.getPiece(row, col);
+                if (piece != null && piece.getClass().getSimpleName().equals("King") && piece.color().equals(color)) {
+                    kingRow = row;
+                    kingCol = col;
+                    break;
+                }
+            }
+        }
+
+        if (kingRow == -1) return false; // Nessun re trovato, fallback
+
+        // Controlla se qualche pezzo avversario può raggiungere il re
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece attacker = board.getPiece(row, col);
+                if (attacker != null && !attacker.color().equals(color)) {
+                    if (attacker.isValidMove(row, (char)(col + 'a'), kingRow, (char)(kingCol + 'a'), board)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean hasLegalMoves(String color) {
+        for (int fromRow = 0; fromRow < 8; fromRow++) {
+            for (int fromCol = 0; fromCol < 8; fromCol++) {
+                Piece piece = board.getPiece(fromRow, fromCol);
+                if (piece != null && piece.color().equals(color)) {
+                    for (int toRow = 0; toRow < 8; toRow++) {
+                        for (int toCol = 0; toCol < 8; toCol++) {
+                            if (piece.isValidMove(fromRow, (char)(fromCol + 'a'), toRow, (char)(toCol + 'a'), board)) {
+                                // Simula la mossa
+                                Piece captured = board.getPiece(toRow, toCol);
+                                board.setPiece(toRow, toCol, piece);
+                                board.setPiece(fromRow, fromCol, null);
+
+                                boolean stillInCheck = isInCheck(color);
+
+                                // Ripristina
+                                board.setPiece(fromRow, fromCol, piece);
+                                board.setPiece(toRow, toCol, captured);
+
+                                if (!stillInCheck) return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isCheckmate(String color) {
+        return isInCheck(color) && !hasLegalMoves(color);
+    }
+
+    public boolean isStalemate(String color) {
+        return !isInCheck(color) && !hasLegalMoves(color);
+    }
 
     public boolean isValidMove(int fromX, char fromY, int toX, char toY,ChessBoard chessBoard) {
         int indexFromY = fromY - 'a';
@@ -49,16 +106,6 @@ public class Game {
         if (piece == null) return false; // Nessun pezzo da muovere
         return piece.isValidMove(fromX, fromY, toX, toY, board);
     }
-
-    /*public boolean isCheck() {
-        King king = board.getKing(turnManager.getCurrentTurn());
-        return king != null && king.isKingInCheck(turnManager.getCurrentTurn(), board);
-    }*/
-
-    /*public boolean isCheckmate() {
-        King king = board.getKing(turnManager.getCurrentTurn());
-        return king != null && king.isCheckmate(turnManager.getCurrentTurn(),board);
-    }*/
 
     public boolean movePiece(int fromX, char fromY, int toX, char toY) {
         int fromYIndex = fromY - 'a';

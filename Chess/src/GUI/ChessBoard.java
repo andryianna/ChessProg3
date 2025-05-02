@@ -2,13 +2,41 @@ package GUI;
 import Pieces.*;
 
 public class ChessBoard {
-    private Piece[][] board;
-    private final PieceFactory pieceFactory;
-
+    private final Piece[][] board;
 
     public ChessBoard() {
         board = new Piece[8][8];
-        pieceFactory = new PieceFactory();
+    }
+
+
+    public int piecesCount() {
+        int count = 0;
+        for (int rank = 0; rank < 8; rank++) {
+            for (char file = 'a'; file <= 'h'; file++) {
+                if (board[rank][file] != null) count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean foundOtherPieceinSameRank(int x, char y, Piece piece) {
+        if (piece instanceof Pawn || piece instanceof King) return false;
+        for (char file = 'a'; file < 'h'; file++) {
+            if (file != x && board[y][file] != null && board[y][file].color().equals(piece.color())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean foundOtherPieceinSameFile(int x,char y, Piece piece) {
+        if (piece instanceof Pawn || piece instanceof King) return false;
+        for (int rank = 0; rank < 8; rank++) {
+            if (rank != y && board[rank][x] != null && board[rank][x].color().equals(piece.color())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasPiece(int x, int y) {
@@ -25,47 +53,31 @@ public class ChessBoard {
             board[x][y] = piece;
         }
     }
-    public void removePiece(int x, int y) {
-        if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-            board[x][y] = null;
-        }
-    }
-    public King getKing(String color) {
-        for (int rank = 0; rank < 8; rank++) {
-            for (char file = 'a'; file <= 'h'; file++) {
-                Piece piece = getPiece(rank, file);
-                if (piece instanceof King && piece.color().equals(color)) {
-                    return (King) piece;
-                }
-            }
-        }
-        return null; // Se il re non viene trovato (caso anomalo)
-    }
     public void setupBoard() {
         /// pezzi bianchi
         for (char file = 97; file <= 104; file++) {
-            pieceFactory.createPiece("pawn", "black", 2, file, board);
+            PieceFactory.createPiece("pawn", "black", 2, file, board);
         }
-        pieceFactory.createPiece("rook","black",1,'a',board);
-        pieceFactory.createPiece("knight","black",1,'b',board);
-        pieceFactory.createPiece("bishop","black",1,'c',board);
-        pieceFactory.createPiece("queen","black",1,'d',board);
-        pieceFactory.createPiece("king","black",1,'e',board);
-        pieceFactory.createPiece("bishop","black",1,'f',board);
-        pieceFactory.createPiece("knight","black",1,'g',board);
-        pieceFactory.createPiece("rook","black",1,'h',board);
+        PieceFactory.createPiece("rook","black",1,'a',board);
+        PieceFactory.createPiece("knight","black",1,'b',board);
+        PieceFactory.createPiece("bishop","black",1,'c',board);
+        PieceFactory.createPiece("queen","black",1,'d',board);
+        PieceFactory.createPiece("king","black",1,'e',board);
+        PieceFactory.createPiece("bishop","black",1,'f',board);
+        PieceFactory.createPiece("knight","black",1,'g',board);
+        PieceFactory.createPiece("rook","black",1,'h',board);
 
         /// pezzi neri
         for (char file = 97; file <= 104; file++) {
-            pieceFactory.createPiece("pawn", "white", 7, file,board);
+            PieceFactory.createPiece("pawn", "white", 7, file,board);
         }
-        pieceFactory.createPiece("rook","white",8,'a',board);
-        pieceFactory.createPiece("knight","white",8,'b',board);
-        pieceFactory.createPiece("bishop","white",8,'c',board);
-        pieceFactory.createPiece("queen","white",8,'d',board);
-        pieceFactory.createPiece("king","white",8,'e',board);
-        pieceFactory.createPiece("bishop","white",8,'f',board);
-        pieceFactory.createPiece("knight","white",8,'g',board);
-        pieceFactory.createPiece("rook","white",8,'h',board);
+        PieceFactory.createPiece("rook","white",8,'a',board);
+        PieceFactory.createPiece("knight","white",8,'b',board);
+        PieceFactory.createPiece("bishop","white",8,'c',board);
+        PieceFactory.createPiece("queen","white",8,'d',board);
+        PieceFactory.createPiece("king","white",8,'e',board);
+        PieceFactory.createPiece("bishop","white",8,'f',board);
+        PieceFactory.createPiece("knight","white",8,'g',board);
+        PieceFactory.createPiece("rook","white",8,'h',board);
     }
 }
