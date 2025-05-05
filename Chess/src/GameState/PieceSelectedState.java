@@ -20,7 +20,7 @@ public class PieceSelectedState implements GameState {
         if (game.isValidMove(selectedX, selectedY, x, y,chessBoard)) {
             game.movePiece(selectedX, selectedY, x, y);
             game.setState(new NoSelectionState(chessBoard));
-            game.getTurnManager().nextTurn();// Deseleziona
+            game.getTurnManager().nextTurn();
         }
     }
 }

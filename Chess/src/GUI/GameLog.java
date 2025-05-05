@@ -1,5 +1,8 @@
 package GUI;
 
+import GameState.CheckState;
+import GameState.CheckmateState;
+import Pieces.Pawn;
 import Pieces.Piece;
 
 import java.io.BufferedWriter;
@@ -37,8 +40,9 @@ public class GameLog {
      * Aggiunge una mossa al log.
      */
 
-    private String getAlgebraicNotation(ChessBoard board,Piece piece, int pieceCount,int fromX, char fromY, int toX, char toY) {
+    public String getAlgebraicNotation(ChessBoard board,Piece piece, int pieceCount,int fromX, char fromY, int toX, char toY) {
         String move = getPieceSymbol(piece);
+        System.out.println("Mossa: " + move);
         /// Se trovo un altro pezzo nella stessa riga o colonna aggiungo riga o colonna di partenza
         if (board.foundOtherPieceinSameFile(fromX,fromY,piece))
             move += fromX;
@@ -50,6 +54,16 @@ public class GameLog {
         /// Altrimenti prendo solo casella di destinazione
         else
             move += toX + toY;
+        if (((Pawn) piece).promoted())
+            move += "=" + piece.getClass().getSimpleName().toLowerCase();
+        /// Se il re avversario viene messo sotto scacco aggiungi il +
+        if (game.getState() instanceof CheckState)
+            move += "+";
+
+        /// Se il gioco finisce con scacco matto aggiungi # invece di +
+        if (game.getState() instanceof CheckmateState)
+            move += "#";
+
         return move;
     }
     public void addMove(ChessBoard board, Piece piece, int fromX, char fromY, int toX, char toY, int pieceCount) {
@@ -73,13 +87,12 @@ public class GameLog {
 
     private String getPieceSymbol(Piece piece) {
         return switch (piece.getClass().getSimpleName()) {
-            case "Pawn" -> "";   // I pedoni non hanno simbolo
             case "Knight" -> "N";
             case "Bishop" -> "B";
             case "Rook" -> "R";
             case "Queen" -> "Q";
             case "King" -> "K";
-            default -> "?";
+            default -> "";
         };
     }
     /**

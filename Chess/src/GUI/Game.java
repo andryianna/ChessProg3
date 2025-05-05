@@ -16,11 +16,28 @@ public class Game {
 
     public void setState(GameState state) {
         this.state = state;
+        state.handleClick(this, -1, 'a');
     }
 
     public GameState getState() {
         return this.state;
     }
+
+    public void evaluateStateAfterMove(String currentPlayerColor) {
+        String opponentColor = currentPlayerColor.equals("white") ? "black" : "white";
+
+        if (isInCheck(opponentColor)) {
+            if (isCheckmate(opponentColor))
+                setState(new CheckmateState());
+            else
+                setState(new CheckState(board));
+        }
+        else if (isStalemate(opponentColor))
+            setState(new StalemateState());
+        else
+            setState(new NoSelectionState(board));
+        }
+
 
     public TurnManager getTurnManager() {
         return turnManager;
@@ -38,7 +55,7 @@ public class Game {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = board.getPiece(row, col);
-                if (piece != null && piece.getClass().getSimpleName().equals("King") && piece.color().equals(color)) {
+                if (piece instanceof King && piece.color().equals(color)) {
                     kingRow = row;
                     kingCol = col;
                     break;
@@ -46,7 +63,7 @@ public class Game {
             }
         }
 
-        if (kingRow == -1) return false; // Nessun re trovato, fallback
+        if (kingRow == -1) return false; // Nessun re trovato
 
         // Controlla se qualche pezzo avversario può raggiungere il re
         for (int row = 0; row < 8; row++) {
@@ -111,20 +128,43 @@ public class Game {
         int fromYIndex = fromY - 'a';
         int toYIndex = toY - 'a';
 
-        if (!isValidMove(fromX, fromY, toX, toY, board)) {
+        Piece piece = board.getPiece(fromX, fromYIndex);
+        if (piece == null || !isValidMove(fromX, fromY, toX, toY, board)) {
             System.out.println("Mossa non valida!");
             return false;
         }
 
-        Piece piece = board.getPiece(fromX, fromYIndex);
+        String playerColor = piece.color();
 
+        // Simula la mossa per vedere se lascia il re sotto scacco
+        Piece captured = board.getPiece(toX, toYIndex);
         board.setPiece(toX, toYIndex, piece);
         board.setPiece(fromX, fromYIndex, null);
 
+        if (isInCheck(playerColor)) {
+            // Ripristina e annulla mossa
+            board.setPiece(fromX, fromYIndex, piece);
+            board.setPiece(toX, toYIndex, captured);
+            System.out.println("Mossa non valida: lascia il re sotto scacco.");
+            return false;
+        }
+
+        if (piece instanceof Pawn) {
+            if ((piece.color().equals("white") && toX == 0) || (piece.color().equals("black") && toX == 7)) {
+                Piece promoted = ChessBoardUI.showPromotionDialog(piece.color(), toX, toYIndex);
+                board.setPiece(toX, toYIndex, promoted);
+                System.out.println("Pedone promosso a " + promoted.getClass().getSimpleName() + "!");
+            }
+        }
+
 
         System.out.println("Mossa valida!");
+
+        // Turno e stato partita
         turnManager.nextTurn();
+        evaluateStateAfterMove(playerColor); // Metodo che imposta lo stato (Check, Checkmate, Stalemate ecc.)
         return true;
     }
+
 
 }

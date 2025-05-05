@@ -12,7 +12,7 @@ public class ChessBoard {
     public int piecesCount() {
         int count = 0;
         for (int rank = 0; rank < 8; rank++) {
-            for (char file = 'a'; file <= 'h'; file++) {
+            for (int file = 0; file < 8; file++) {
                 if (board[rank][file] != null) count++;
             }
         }
@@ -66,6 +66,8 @@ public class ChessBoard {
         PieceFactory.createPiece("bishop","black",1,'f',board);
         PieceFactory.createPiece("knight","black",1,'g',board);
         PieceFactory.createPiece("rook","black",1,'h',board);
+        PieceFactory.createPiece("pawn", "white", 3, 'g',board);
+        PieceFactory.createPiece("pawn", "white", 3, 'f',board);
 
         /// pezzi neri
         for (char file = 97; file <= 104; file++) {

@@ -10,8 +10,8 @@ import java.io.File;
 
 
 import GameState.*;
+import Pieces.*;
 import TurnObserver.*;
-import Pieces.Piece;
 
 public class ChessBoardUI extends JFrame implements TurnObserver {
     private final ChessBoard chessBoard = new ChessBoard();
@@ -88,7 +88,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                 button.setPreferredSize(new Dimension(60, 60));
                 button.setBackground((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
 
-                button.addMouseListener(listener(selectedPieceX,selectedPieceY,row, col,button));
+                button.addMouseListener(listener(row, col,button));
 
                 boardButtons[row][col] = button;
                 gbc.gridx = col + 1;
@@ -124,16 +124,14 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         return selected.color().equals(currentTurn);
     }
 
-    private MouseListener listener(int selectedX, char selectedY, int finalRow, int finalCol, JButton button) {
+    private MouseListener listener(int finalRow, int finalCol, JButton button) {
         return new MouseAdapter() {
             final Color originalColor = (finalRow + finalCol) % 2 == 0 ? Color.WHITE : Color.GRAY;
-            final int pieceCount = chessBoard.piecesCount();
 
             @Override
             public void mousePressed(MouseEvent e) {
                 /// azioni con il tasto destro del mouse
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    System.out.println("Chessboard: " + chessBoard);
                     if (button.getBackground().equals(Color.RED))
                         button.setBackground(originalColor);
                     else
@@ -142,7 +140,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                 }
 
                 Piece selectedPiece =  chessBoard.getPiece(finalRow,(char) finalCol);
-                final Piece currentPiece = chessBoard.getPiece(selectedX, selectedY);
+                int pieceCount = chessBoard.piecesCount();
                 System.out.println("Selezionato pezzo " + selectedPiece);
 
                 /// azioni con il tasto sinistro del mouse
@@ -153,7 +151,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                             selectedPieceX = finalRow;
                             selectedPieceY = (char) (finalCol + 'a');
                             button.setBackground(Color.YELLOW);
-                            System.out.println("Pezzo selezionato a " + selectedPieceY + selectedPieceX);
+                            System.out.println("Pezzo" + selectedPiece + "selezionato a " + selectedPieceY + selectedPieceX);
                         } else if (game.getState() instanceof PieceSelectedState) {
                         if (selectedPieceX == finalRow && selectedPieceY == (char) (finalCol + 'a')) {
                             game.setState(new NoSelectionState(chessBoard));
@@ -161,7 +159,8 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                             System.out.println("Deselezionato pezzo.");
                         } else if (game.isValidMove(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'),chessBoard)) {
                             if (game.movePiece(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'))) {
-                                gameLog.addMove(chessBoard, currentPiece, selectedX, selectedY, finalRow, (char) (finalCol + 'a'), pieceCount);
+                                button.setBackground(originalColor);
+                                System.out.println(gameLog.getAlgebraicNotation(chessBoard,selectedPiece,pieceCount,selectedPieceX,selectedPieceY,finalRow,(char)(finalCol+'a')));
                                 game.setState(new NoSelectionState(chessBoard));
                                 renderPieces();
                             }
@@ -194,6 +193,27 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         ImageIcon icon = new ImageIcon(path);
         Image scaled = icon.getImage().getScaledInstance(33, 33,Image.SCALE_DEFAULT);
         return new ImageIcon(scaled);
+    }
+
+    public static Piece showPromotionDialog(String color, int rank, int file) {
+        String[] options = { "Regina", "Torre", "Alfiere", "Cavallo" };
+        String choice = (String) JOptionPane.showInputDialog(
+                null,
+                "Scegli il pezzo per la promozione:",
+                "Promozione del Pedone",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        if (choice == null) choice = "Queen"; // default
+
+        return switch (choice) {
+            case "Torre" -> new Rook(color, rank, (char) (file + 'a'));
+            case "Alfiere" -> new Bishop(color, rank, (char) (file + 'a'));
+            case "Cavallo" -> new Knight(color, rank, (char) (file + 'a'));
+            default -> new Queen(color, rank, (char) (file + 'a'));
+        };
     }
 
     public static void main(String[] args) {
