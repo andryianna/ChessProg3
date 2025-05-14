@@ -28,6 +28,6 @@ public class Knight implements Piece {
 
 
         /// Se la casella di destinazione è vuota o ha un pezzo avversario, la mossa è valida
-        return (destinationPiece == null || !destinationPiece.color().equals(this.color()));
+        return (destinationPiece instanceof Null || !destinationPiece.color().equals(this.color()));
     }
 }

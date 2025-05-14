@@ -2,14 +2,35 @@ package Pieces;
 
 import GUI.ChessBoard;
 
-public record Rook(String color, int rank, char file) implements Piece {
+public class Rook implements Piece {
+    private final String color;
+    private final int rank;
+    private final char file;
+    private boolean hasMoved = false;
+
+    public Rook(String color, int rank, char file) {
+        this.color = color;
+        this.rank = rank;
+        this.file = file;
+    }
+
+    public String color() {
+        return color;
+    }
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setMoved(boolean moved) {
+        this.hasMoved = moved;
+    }
 
     @Override
     public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
         boolean sameRank = startRank == endRank;
         boolean sameFile = startFile == endFile;
 
-        /// Movimento in orizzontale o in verticale
         if (!sameFile && !sameRank) {
             return false;
         }
@@ -17,16 +38,10 @@ public record Rook(String color, int rank, char file) implements Piece {
         int rankDir = Integer.compare(endRank, startRank);
         int fileDir = Integer.compare(endFile, startFile);
 
-        /// Controlla se il percorso é pulito
-        if (!isPathClear(board,startRank,startFile,rankDir,fileDir,endRank,endFile)) return false;
+        if (!isPathClear(board, startRank, startFile, rankDir, fileDir, endRank, endFile)) return false;
 
-        /// Se la casella di destinazione é vuota o se é del colore avversario restituisce vero
         Piece destinationPiece = board.getPiece(endRank, endFile - 'a');
-        if (destinationPiece == null)
-            return true;
-        if (!destinationPiece.color().equals(this.color()))
-            return true;
-        return false;
+        return destinationPiece instanceof Null || !destinationPiece.color().equals(this.color());
     }
 
     private boolean isPathClear(ChessBoard board, int startRank, char startFile, int rankDir, int fileDir, int endRank, char endFile) {
@@ -35,7 +50,7 @@ public record Rook(String color, int rank, char file) implements Piece {
         int targetFile = endFile - 'a';
 
         while (rank != endRank || file != targetFile) {
-            if (board.getPiece(rank, file) != null) {
+            if (!(board.getPiece(rank, file) instanceof Null)) {
                 return false;
             }
             rank += rankDir;
@@ -44,5 +59,4 @@ public record Rook(String color, int rank, char file) implements Piece {
 
         return true;
     }
-
 }

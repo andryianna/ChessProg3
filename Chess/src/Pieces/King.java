@@ -2,7 +2,29 @@ package Pieces;
 
 import GUI.ChessBoard;
 
-public record King(String color, int rank, char file) implements Piece {
+public class King implements Piece {
+    private final String color;
+    private final int rank;
+    private final char file;
+    private boolean hasMoved = false;
+
+    public King(String color, int rank, char file) {
+        this.color = color;
+        this.rank = rank;
+        this.file = file;
+    }
+
+    public String color() {
+        return color;
+    }
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setMoved(boolean moved) {
+        this.hasMoved = moved;
+    }
 
     @Override
     public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
@@ -10,10 +32,8 @@ public record King(String color, int rank, char file) implements Piece {
         int fileDiff = Math.abs(endCol - startCol);
 
         Piece destinationPiece = board.getPiece(endRank, endCol - 'a');
+        if (rankDiff > 2 || fileDiff > 2) return false;
 
-        /// Si muove di una casella in tutte le direzioni
-        return (rankDiff == 1 || fileDiff == 1) && (destinationPiece == null || !destinationPiece.color().equals(this.color()));
-
+        return destinationPiece instanceof Null || !destinationPiece.color().equals(this.color());
     }
-
 }

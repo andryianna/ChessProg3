@@ -14,8 +14,8 @@ import Pieces.*;
 import TurnObserver.*;
 
 public class ChessBoardUI extends JFrame implements TurnObserver {
-    private final ChessBoard chessBoard = new ChessBoard();
     private final TurnManager turnManager = new TurnManager();
+    private final ChessBoard chessBoard = new ChessBoard(turnManager);
     private final Game game = new Game(chessBoard,turnManager);
     private final GameLog gameLog = new GameLog(game,"log.pgn");
     private final JLabel turnLabel;
@@ -39,6 +39,12 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
 
         // Label per il turno
         turnLabel = new JLabel("Turno del Bianco", SwingConstants.CENTER);
+        JButton againButton = new JButton("Nuova partita");
+        againButton.addActionListener(e -> {
+            JFrame frame = new ChessBoardUI();
+            frame.setVisible(true);
+        });
+        add(againButton, BorderLayout.SOUTH);
         add(turnLabel, BorderLayout.NORTH);
 
         // Pannello principale con le coordinate
@@ -160,7 +166,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                         } else if (game.isValidMove(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'),chessBoard)) {
                             if (game.movePiece(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'))) {
                                 button.setBackground(originalColor);
-                                System.out.println(gameLog.getAlgebraicNotation(chessBoard,selectedPiece,pieceCount,selectedPieceX,selectedPieceY,finalRow,(char)(finalCol+'a')));
+                                //System.out.println(gameLog.getAlgebraicNotation(chessBoard,selectedPiece,pieceCount,selectedPieceX,selectedPieceY,finalRow,(char)(finalCol+'a')));
                                 game.setState(new NoSelectionState(chessBoard));
                                 renderPieces();
                             }

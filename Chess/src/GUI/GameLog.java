@@ -55,7 +55,6 @@ public class GameLog {
         else
             move += toX + toY;
         if (((Pawn) piece).promoted())
-            move += "=" + piece.getClass().getSimpleName().toLowerCase();
         /// Se il re avversario viene messo sotto scacco aggiungi il +
         if (game.getState() instanceof CheckState)
             move += "+";

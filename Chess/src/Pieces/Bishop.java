@@ -19,7 +19,7 @@ public record Bishop(String color, int rank, char file) implements Piece {
         int fileDir = Integer.compare(endFile, startFile);
         Piece destinationPiece = board.getPiece(endRank, endFile - 'a');
         if (!isPathClear(board,startRank,startFile,rankDir,fileDir,endRank,endFile)) return false;
-        if (destinationPiece != null && destinationPiece.color().equals(this.color())) return false;
+        if (!(destinationPiece instanceof Null) && destinationPiece.color().equals(this.color())) return false;
 
         return true;
     }
@@ -31,7 +31,7 @@ public record Bishop(String color, int rank, char file) implements Piece {
         int targetFile = endFile - 'a';
 
         while (rank != endRank || file != targetFile) {
-            if (board.getPiece(rank, file) != null) {
+            if (!(board.getPiece(rank, file) instanceof Null)) {
                 return false;
             }
             rank += rankDir;

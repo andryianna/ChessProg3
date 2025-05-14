@@ -3,17 +3,51 @@ import Pieces.*;
 
 public class ChessBoard {
     private final Piece[][] board;
+    private final TurnManager turnManager;
+    private int enPassantTargetRow = -1;
+    private int enPassantTargetCol = -1;
 
-    public ChessBoard() {
+    public void setEnPassantTarget(int row, int col) {
+        this.enPassantTargetRow = row;
+        this.enPassantTargetCol = col;
+    }
+
+    public boolean isEnPassantTarget(int row, int col) {
+        return this.enPassantTargetRow == row && this.enPassantTargetCol == col;
+    }
+
+    public void resetEnPassantTarget() {
+        this.enPassantTargetRow = -1;
+        this.enPassantTargetCol = -1;
+    }
+
+
+    public ChessBoard(TurnManager turnManager) {
+        this.turnManager = turnManager;
         board = new Piece[8][8];
     }
+
+    public boolean isSquareAttacked(int row, int col, String byColor) {
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece attacker = board[r][c];
+                if (!(attacker instanceof Null) && attacker.color().equals(byColor)) {
+                    if (attacker.isValidMove(r, (char)(c + 'a'), row, (char)(col + 'a'), this)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
 
     public int piecesCount() {
         int count = 0;
         for (int rank = 0; rank < 8; rank++) {
             for (int file = 0; file < 8; file++) {
-                if (board[rank][file] != null) count++;
+                if (!(board[rank][file] instanceof Null)) count++;
             }
         }
         return count;
@@ -22,7 +56,7 @@ public class ChessBoard {
     public boolean foundOtherPieceinSameRank(int x, char y, Piece piece) {
         if (piece instanceof Pawn || piece instanceof King) return false;
         for (char file = 'a'; file < 'h'; file++) {
-            if (file != x && board[y][file] != null && board[y][file].color().equals(piece.color())) {
+            if (file != x && !(board[y][file] instanceof Null) && board[y][file].color().equals(piece.color())) {
                 return true;
             }
         }
@@ -32,7 +66,7 @@ public class ChessBoard {
     public boolean foundOtherPieceinSameFile(int x,char y, Piece piece) {
         if (piece instanceof Pawn || piece instanceof King) return false;
         for (int rank = 0; rank < 8; rank++) {
-            if (rank != y && board[rank][x] != null && board[rank][x].color().equals(piece.color())) {
+            if (rank != y && !(board[rank][x] instanceof Null) && board[rank][x].color().equals(piece.color())) {
                 return true;
             }
         }
@@ -41,11 +75,11 @@ public class ChessBoard {
 
     public boolean hasPiece(int x, int y) {
         if (x < 0 || x >= 8 || y < 0 || y >= 8) return false;
-        return board[x][y] != null;
+        return !(board[x][y] instanceof Null);
     }
 
     public Piece getPiece(int x, int y) {
-        if (x + 1 < 0 || x > 8 || y + 1 < 0 || y > 8) return null;
+        if (x + 1 < 0 || x > 8 || y + 1 < 0 || y > 8) return new Null(turnManager);
         return board[x][y];
     }
     public void setPiece(int x, int y, Piece piece) {
@@ -54,7 +88,7 @@ public class ChessBoard {
         }
     }
     public void setupBoard() {
-        /// pezzi bianchi
+        // pezzi neri
         for (char file = 97; file <= 104; file++) {
             PieceFactory.createPiece("pawn", "black", 2, file, board);
         }
@@ -66,10 +100,8 @@ public class ChessBoard {
         PieceFactory.createPiece("bishop","black",1,'f',board);
         PieceFactory.createPiece("knight","black",1,'g',board);
         PieceFactory.createPiece("rook","black",1,'h',board);
-        PieceFactory.createPiece("pawn", "white", 3, 'g',board);
-        PieceFactory.createPiece("pawn", "white", 3, 'f',board);
 
-        /// pezzi neri
+        // pezzi bianchi
         for (char file = 97; file <= 104; file++) {
             PieceFactory.createPiece("pawn", "white", 7, file,board);
         }
@@ -81,5 +113,15 @@ public class ChessBoard {
         PieceFactory.createPiece("bishop","white",8,'f',board);
         PieceFactory.createPiece("knight","white",8,'g',board);
         PieceFactory.createPiece("rook","white",8,'h',board);
+
+        // riempi il resto con pezzi Null
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] == null) {
+                    board[i][j] = new Null(turnManager);
+                }
+            }
+
+        }
     }
 }
