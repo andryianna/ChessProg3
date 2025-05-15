@@ -33,10 +33,10 @@ public class Attack implements ComputerStrategy{
                 int distanceToKing = calculateDistanceToKing(king,board,row,col),distanceToQueen = calculateDistanceToQueen(queen,board,row,col);
                 for (int toRow = 0; toRow < 8; toRow++) {
                     for (int toCol = 0; toCol < 8; toCol++) {
-                        if (strategy <= 70 && !!simulateMove(row,col,toRow,toCol,board)){
+                        if (strategy <= 70 && simulateMoveKing(row,col,toRow,toCol,distanceToKing,color,board,game)){
                             return game.movePiece(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
                         }
-                        else if (!simulateMove(row,col,toRow,toCol,board)){
+                        else if (simulateMoveQueen(row,col,toRow,toCol,distanceToQueen,color,board,game)){
                             return game.movePiece(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
                         }
                     }
@@ -44,6 +44,18 @@ public class Attack implements ComputerStrategy{
             }
         }
         return false;
+    }
+
+    private boolean simulateMoveKing(int row, int col, int toRow, int toCol,int distance, String color, ChessBoard board,Game game){
+        Piece[][] backup = board.getBoard();
+        if (board.getPiece(row,col).isValidMove(row,(char)(col+'a'),toRow,(char)(toCol+'a'),board)){
+            game.movePiece(row,(char)(col+'a'),toRow,(char)(toCol+'a'));
+        }
+        boolean result = false;
+        if (distance < calculateDistanceToKing((King)(board.findKing(color)),board,row,col))
+            result = true;
+        board.setBoard(backup);
+        return result;
     }
 
     private int calculateDistanceToKing(King king, ChessBoard board, int row, int col){
@@ -58,8 +70,16 @@ public class Attack implements ComputerStrategy{
         return distance;
     }
 
-    private boolean simulateMove(int row, int col, int toRow, int toCol, ChessBoard board){
-        return board.getPiece(row,col).isValidMove(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'), board);
+
+    private boolean simulateMoveQueen(int row, int col, int toRow, int toCol,int distance, String color, ChessBoard board,Game game){
+        Piece[][] backup = board.getBoard();
+        if (board.getPiece(row,col).isValidMove(row,(char)(col+'a'),toRow,(char)(toCol+'a'),board))
+            game.movePiece(row,(char)(col+'a'),toRow,(char)(toCol+'a'));
+        boolean result = false;
+        if (distance < calculateDistanceToQueen((Queen)(board.findQueen(color)),board,row,col))
+        result = true;
+        board.setBoard(backup);
+        return result;
     }
 
     private int calculateDistanceToQueen(Queen queen,ChessBoard board,int row,int col){
