@@ -36,4 +36,12 @@ public class King implements Piece {
 
         return destinationPiece instanceof Null || !destinationPiece.color().equals(this.color());
     }
+
+    public int getRank() {
+        return this.rank;
+    }
+
+    public char getFile() {
+        return this.file;
+    }
 }

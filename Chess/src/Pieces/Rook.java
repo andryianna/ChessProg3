@@ -26,6 +26,7 @@ public class Rook implements Piece {
         this.hasMoved = moved;
     }
 
+
     @Override
     public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
         boolean sameRank = startRank == endRank;

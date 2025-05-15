@@ -1,6 +1,5 @@
-package GUI;
+package TurnObserver;
 
-import TurnObserver.TurnObserver;
 import java.util.ArrayList;
 import java.util.List;
 

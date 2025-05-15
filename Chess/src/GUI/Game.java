@@ -1,6 +1,7 @@
 package GUI;
 import Pieces.*;
 import GameState.*;
+import TurnObserver.TurnManager;
 
 public class Game {
     private final ChessBoard board;
@@ -137,15 +138,12 @@ public class Game {
         Piece piece = board.getPiece(fromX, fromYIndex);
         Piece dest = board.getPiece(toX, toYIndex);
 
-        System.out.println("Tenta di muovere il pezzo: " + piece.getClass().getSimpleName() + " da " + fromY + fromX + " a " + toY + toX);
 
         // Controllo se si tratta di arrocco
         if (piece instanceof King && Math.abs(fromYIndex - toYIndex) == 2) {
-            System.out.println("Tentativo di arrocco da " + fromY + fromX + " a " + toY + toX);
 
             // Arrocco corto (da una torre)
             if (toYIndex > fromYIndex) {
-                System.out.println("Arrocco corto: " + piece.color());
                 if (isCastlingPossible(fromX, fromYIndex, toX, toYIndex, piece.color())) {
                     // Esegui arrocco corto
                     Piece rook = board.getPiece(fromX, 7); // Torre destra
@@ -155,15 +153,12 @@ public class Game {
                     board.setPiece(fromX, 7, new Null(turnManager)); // Elimina la torre dalla posizione iniziale
 
                     turnManager.nextTurn();
-                    System.out.println("Arrocco corto effettuato!");
                     return true;
                 } else {
-                    System.out.println("Arrocco corto non possibile.");
                 }
             }
             // Arrocco lungo (da una torre)
             else {
-                System.out.println("Arrocco lungo: " + piece.color());
                 if (isCastlingPossible(fromX, fromYIndex, toX, toYIndex, piece.color())) {
                     // Esegui arrocco lungo
                     Piece rook = board.getPiece(fromX, 0); // Torre sinistra
@@ -173,10 +168,8 @@ public class Game {
                     board.setPiece(fromX, 0, new Null(turnManager)); // Elimina la torre dalla posizione iniziale
 
                     turnManager.nextTurn();
-                    System.out.println("Arrocco lungo effettuato!");
                     return true;
                 } else {
-                    System.out.println("Arrocco lungo non possibile.");
                 }
             }
         }
@@ -198,7 +191,6 @@ public class Game {
                     int capturedRow = toX + (piece.color().equals("white") ? 1 : -1);
                     captured = board.getPiece(capturedRow, toYIndex);
                     board.setPiece(capturedRow, toYIndex, new Null(turnManager));
-                    System.out.println("En Passant catturato: " + captured.getClass().getSimpleName());
                 }
             }
         }

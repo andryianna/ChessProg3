@@ -1,6 +1,4 @@
-package GUI;
-
-import Pieces.*;
+package Pieces;
 
 public class PieceFactory {
     public static void createPiece(String type, String color,int rank,char file,Piece [][]board) {

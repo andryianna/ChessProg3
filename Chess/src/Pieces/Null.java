@@ -1,8 +1,7 @@
 package Pieces;
 
 import GUI.ChessBoard;
-import GUI.TurnManager;
-import TurnObserver.TurnObserver;
+import TurnObserver.TurnManager;
 
 public class Null implements Piece{
     TurnManager turnObserver;

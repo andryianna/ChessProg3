@@ -1,11 +1,32 @@
 package GUI;
 import Pieces.*;
+import TurnObserver.TurnManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChessBoard {
     private final Piece[][] board;
     private final TurnManager turnManager;
     private int enPassantTargetRow = -1;
     private int enPassantTargetCol = -1;
+
+    public ChessBoard(TurnManager turnManager) {
+        this.turnManager = turnManager;
+        board = new Piece[8][8];
+    }
+
+    public Piece[][] getBoard() {
+        return board;
+    }
+
+    public void setBoard(Piece[][] board) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                this.board[i][j] = board[i][j];
+            }
+        }
+    }
 
     public void setEnPassantTarget(int row, int col) {
         this.enPassantTargetRow = row;
@@ -21,11 +42,6 @@ public class ChessBoard {
         this.enPassantTargetCol = -1;
     }
 
-
-    public ChessBoard(TurnManager turnManager) {
-        this.turnManager = turnManager;
-        board = new Piece[8][8];
-    }
 
     public boolean isSquareAttacked(int row, int col, String byColor) {
         for (int r = 0; r < 8; r++) {
@@ -63,6 +79,30 @@ public class ChessBoard {
         return false;
     }
 
+    public Piece findKing(String color){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] instanceof King && board[i][j].color().equals(color)) {
+                    return board[i][j];
+                }
+            }
+        }
+        return new Null(turnManager);
+    }
+
+    public Piece findQueen(String color){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] instanceof Queen && board[i][j].color().equals(color)) {
+                    return board[i][j];
+                }
+            }
+        }
+        return new Null(turnManager);
+    }
+
+
+
     public boolean foundOtherPieceinSameFile(int x,char y, Piece piece) {
         if (piece instanceof Pawn || piece instanceof King) return false;
         for (int rank = 0; rank < 8; rank++) {
@@ -87,6 +127,20 @@ public class ChessBoard {
             board[x][y] = piece;
         }
     }
+
+    public List<Piece> getAllPieces(String color) {
+        List<Piece> pieces = new ArrayList<>();
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board[row][col];
+                if (!(piece instanceof Null) && piece.color().equals(color)) {
+                    pieces.add(piece);
+                }
+            }
+        }
+        return pieces;
+    }
+
     public void setupBoard() {
         // pezzi neri
         for (char file = 97; file <= 104; file++) {
