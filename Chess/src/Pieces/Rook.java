@@ -13,7 +13,23 @@ public class Rook implements Piece {
         this.rank = rank;
         this.file = file;
     }
+    @Override
+    public boolean canAttack(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
+        if (startRank != endRank && startFile != endFile) return false;
 
+        int dx = Integer.compare(endRank, startRank);
+        int dy = Integer.compare(endFile, startFile);
+
+        int x = startRank + dx, y = startFile + dy;
+        while (x != endRank || y != endFile) {
+            if (!(board.getPiece(x, y) instanceof Null)) return false;
+            x += dx;
+            y += dy;
+        }
+        return true;
+    }
+
+    @Override
     public String color() {
         return color;
     }

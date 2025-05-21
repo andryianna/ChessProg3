@@ -136,7 +136,7 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                /// azioni con il tasto destro del mouse
+                // azioni con il tasto destro del mouse
                 if (SwingUtilities.isRightMouseButton(e)) {
                     if (button.getBackground().equals(Color.RED))
                         button.setBackground(originalColor);
@@ -149,30 +149,23 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                 int pieceCount = chessBoard.piecesCount();
                 System.out.println("Selezionato pezzo " + selectedPiece);
 
-                /// azioni con il tasto sinistro del mouse
+                // azioni con il tasto sinistro del mouse
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    System.out.println(game.getState());
                         if (game.getState() instanceof NoSelectionState && checkCurrentTurn(selectedPiece)) {
                             game.setState(new PieceSelectedState(finalRow, (char) finalCol, chessBoard));
                             selectedPieceX = finalRow;
                             selectedPieceY = (char) (finalCol + 'a');
                             button.setBackground(Color.YELLOW);
-                            System.out.println("Pezzo" + selectedPiece + "selezionato a " + selectedPieceY + selectedPieceX);
                         } else if (game.getState() instanceof PieceSelectedState) {
                         if (selectedPieceX == finalRow && selectedPieceY == (char) (finalCol + 'a')) {
                             game.setState(new NoSelectionState(chessBoard));
                             button.setBackground(originalColor);
                             System.out.println("Deselezionato pezzo.");
-                        } else if (game.isValidMove(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'),chessBoard)) {
-                            if (game.movePiece(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'))) {
-                                button.setBackground(originalColor);
-                                //System.out.println(gameLog.getAlgebraicNotation(chessBoard,selectedPiece,pieceCount,selectedPieceX,selectedPieceY,finalRow,(char)(finalCol+'a')));
-                                game.setState(new NoSelectionState(chessBoard));
-                                renderPieces();
-                            }
-
-                        } else {
-                            System.out.println("Mossa non valida!");
+                        } else if (game.movePiece(selectedPieceX, selectedPieceY, finalRow, (char) (finalCol + 'a'))) {
+                            repaintBoard();
+                            //System.out.println(gameLog.getAlgebraicNotation(chessBoard,selectedPiece,pieceCount,selectedPieceX,selectedPieceY,finalRow,(char)(finalCol+'a')));
+                            game.setState(new NoSelectionState(chessBoard));
+                            renderPieces();
                         }
                     }
                 }
@@ -184,6 +177,17 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
     public void onTurnChanged(boolean isWhiteTurn) {
         turnLabel.setText(isWhiteTurn ? "Turno del Bianco" : "Turno del Nero");
         currentTurn = isWhiteTurn ? "white" : "black";
+    }
+
+    private void repaintBoard(){
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                boardButtons[row][col].setBackground((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
+
+            }
+        }
+        repaint();
+        revalidate();
     }
 
     private void setupBoard() {

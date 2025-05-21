@@ -8,127 +8,10 @@ public class Game {
     private GameState state;
     private final TurnManager turnManager;
 
-
     public Game(ChessBoard board, TurnManager turnmanager) {
         this.board = board;
         this.state = new NoSelectionState(board);
         this.turnManager = turnmanager;
-    }
-
-    public void setState(GameState state) {
-        this.state = state;
-        state.handleClick(this, -1, 'a');
-    }
-
-    public GameState getState() {
-        return this.state;
-    }
-
-    public void evaluateStateAfterMove(String currentPlayerColor) {
-        String opponentColor = currentPlayerColor.equals("white") ? "black" : "white";
-
-        if (isInCheck(opponentColor)) {
-            if (isCheckmate(opponentColor))
-                setState(new CheckmateState());
-            else
-                setState(new CheckState(board));
-        }
-        else if (isStalemate(opponentColor))
-            setState(new StalemateState());
-        else
-            setState(new NoSelectionState(board));
-        }
-
-
-    public TurnManager getTurnManager() {
-        return turnManager;
-    }
-
-    public boolean hasPiece(int x, int y) {
-        return board.hasPiece(x, y);
-    }
-
-    public boolean isInCheck(String color) {
-        int kingX = -1, kingY = -1;
-
-        // Trova il Re del colore specificato
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                Piece piece = board.getPiece(row, col);
-                if (piece instanceof King && piece.color().equals(color)) {
-                    kingX = row;
-                    kingY = col;
-                    break;
-                }
-            }
-        }
-
-        if (kingX == -1 || kingY == -1) return false; // Re non trovato
-
-        String opponentColor = color.equals("white") ? "black" : "white";
-
-        // Verifica se il Re è sotto attacco
-        return board.isSquareAttacked(kingX, kingY, opponentColor);
-    }
-
-
-
-    public boolean hasLegalMoves(String color) {
-        if (color == null) return false;
-
-        for (int fromRow = 0; fromRow < 8; fromRow++) {
-            for (int fromCol = 0; fromCol < 8; fromCol++) {
-                Piece piece = board.getPiece(fromRow, fromCol);
-
-                if (!(piece instanceof Null) && piece.color().equals(color)) {
-                    for (int toRow = 0; toRow < 8; toRow++) {
-                        for (int toCol = 0; toCol < 8; toCol++) {
-                            if (fromRow == toRow && fromCol == toCol) continue;
-
-                            if (piece.isValidMove(fromRow, (char)(fromCol + 'a'), toRow, (char)(toCol + 'a'), board)) {
-                                // Se il Re si sposta su una casella attaccata, scarta
-                                if (piece instanceof King &&
-                                        board.isSquareAttacked(toRow, toCol, color.equals("white") ? "black" : "white")) {
-                                    continue;
-                                }
-
-                                // Simula la mossa
-                                Piece captured = board.getPiece(toRow, toCol);
-                                board.setPiece(toRow, toCol, piece);
-                                board.setPiece(fromRow, fromCol, new Null(turnManager));
-
-                                boolean stillInCheck = isInCheck(color);
-
-                                // Ripristina
-                                board.setPiece(fromRow, fromCol, piece);
-                                board.setPiece(toRow, toCol, captured);
-
-                                if (!stillInCheck) return true; // mossa legale trovata
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return false; // nessuna mossa legale disponibile
-    }
-
-
-
-    public boolean isCheckmate(String color) {
-        return isInCheck(color) && !hasLegalMoves(color);
-    }
-
-    public boolean isStalemate(String color) {
-        return !isInCheck(color) && !hasLegalMoves(color);
-    }
-
-    public boolean isValidMove(int fromX, char fromY, int toX, char toY,ChessBoard chessBoard) {
-        int indexFromY = fromY - 'a';
-        Piece piece = chessBoard.getPiece(fromX, indexFromY);
-        if (piece == null) return false; // Nessun pezzo da muovere
-        return piece.isValidMove(fromX, fromY, toX, toY, board);
     }
 
     public boolean movePiece(int fromX, char fromY, int toX, char toY) {
@@ -138,13 +21,13 @@ public class Game {
         Piece piece = board.getPiece(fromX, fromYIndex);
         Piece dest = board.getPiece(toX, toYIndex);
 
-
         // Controllo se si tratta di arrocco
         if (piece instanceof King && Math.abs(fromYIndex - toYIndex) == 2) {
-
-            // Arrocco corto (da una torre)
-            if (toYIndex > fromYIndex) {
-                if (isCastlingPossible(fromX, fromYIndex, toX, toYIndex, piece.color())) {
+            if (isCastlingPossible(fromX, fromYIndex, toX, toYIndex, piece.color()))
+                // Arrocco corto
+                if (toYIndex > fromYIndex)
+                {
+                    System.out.println("Arrocco corto da una torre");
                     // Esegui arrocco corto
                     Piece rook = board.getPiece(fromX, 7); // Torre destra
                     board.setPiece(toX, toYIndex, piece); // Sposta il re
@@ -154,13 +37,10 @@ public class Game {
 
                     turnManager.nextTurn();
                     return true;
-                } else {
                 }
-            }
-            // Arrocco lungo (da una torre)
-            else {
-                if (isCastlingPossible(fromX, fromYIndex, toX, toYIndex, piece.color())) {
-                    // Esegui arrocco lungo
+            // Arrocco lungo
+                else {
+                // Esegui arrocco lungo
                     Piece rook = board.getPiece(fromX, 0); // Torre sinistra
                     board.setPiece(toX, toYIndex, piece); // Sposta il re
                     board.setPiece(fromX, fromYIndex, new Null(turnManager)); // Elimina il re dalla posizione iniziale
@@ -169,11 +49,9 @@ public class Game {
 
                     turnManager.nextTurn();
                     return true;
-                } else {
-                }
-            }
-        }
 
+                }
+        }
 
         if (!piece.isValidMove(fromX, fromY, toX, toY, board)) {
             System.out.println("Mossa non valida!");
@@ -194,7 +72,6 @@ public class Game {
                 }
             }
         }
-
 
         // Applica temporaneamente la mossa
         board.setPiece(toX, toYIndex, piece);
@@ -236,30 +113,44 @@ public class Game {
         return true;
     }
 
+    public boolean isValidMove(int fromX, char fromY, int toX, char toY,ChessBoard chessBoard) {
+        int indexFromY = fromY - 'a';
+        Piece piece = chessBoard.getPiece(fromX, indexFromY);
+        if (piece instanceof Null) return false;
+        return piece.isValidMove(fromX, fromY, toX, toY, board);
+    }
 
     private boolean isCastlingPossible(int fromX, int fromY, int toX, int toY, String color) {
         System.out.println("Verifica arrocco per il colore: " + color + " dal " + fromY + fromX + " a " + toY + toX);
 
+        int direction = (toY > fromY) ? 1 : -1;
+        int rookCol = (direction == 1) ? 7 : 0;
+
         // Verifica se il re o la torre sono già stati mossi
-        if (hasMoved(fromX, fromY) || hasMoved(fromX, toY)) {
+        if (hasMoved(fromX, fromY) || hasMoved(fromX, rookCol)) {
             System.out.println("Il re o la torre sono già stati mossi, arrocco non possibile.");
             return false;
         }
 
+        // Verifica che ci sia effettivamente una torre valida nella posizione prevista
+        Piece rook = board.getPiece(fromX, rookCol);
+        if (!(rook instanceof Rook) || !rook.color().equals(color)) {
+            System.out.println("La torre per l'arrocco non è valida.");
+            return false;
+        }
+
         // Verifica che non ci siano pezzi tra il re e la torre
-        int direction = (toY > fromY) ? 1 : -1; // Determina la direzione (corto o lungo)
-        for (int i = fromY + direction; i != toY; i += direction) {
+        for (int i = fromY + direction; i != rookCol; i += direction) {
             if (!(board.getPiece(fromX, i) instanceof Null)) {
                 System.out.println("Ci sono pezzi tra il re e la torre.");
-                return false; // Ci sono pezzi tra il re e la torre
+                return false;
             }
         }
 
-        // Verifica che il re non sia sotto scacco, non passi sopra una casa sotto scacco, e non finisca in scacco
-        for (int i = 0; i < 3; i++) {
-            int checkRow = fromX;
-            int checkCol = (direction == 1) ? fromY + i : fromY - i;
-            if (isInCheck(color)) {
+        // Verifica che il re non sia sotto scacco, non attraversi case sotto scacco e non finisca in scacco
+        for (int i = 0; i <= 2; i++) {
+            int checkCol = fromY + i * direction;
+            if (board.isSquareAttacked(fromX, checkCol, color)) {
                 System.out.println("Il re è sotto scacco durante l'arrocco.");
                 return false;
             }
@@ -269,6 +160,85 @@ public class Game {
         return true;
     }
 
+    public void evaluateStateAfterMove(String currentPlayerColor) {
+        String opponentColor = currentPlayerColor.equals("white") ? "black" : "white";
+
+        if (isInCheck(opponentColor)) {
+            if (isCheckmate(opponentColor))
+                setState(new CheckmateState());
+            else
+                setState(new CheckState(board));
+        }
+        else if (isStalemate(opponentColor))
+            setState(new StalemateState());
+        else
+            setState(new NoSelectionState(board));
+        }
+
+
+    public boolean isInCheck(String color) {
+        int kingX = -1, kingY = -1;
+
+        // Trova il Re del colore specificato
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board.getPiece(row, col);
+                if (piece instanceof King && piece.color().equals(color)) {
+                    kingX = row;
+                    kingY = col;
+                    break;
+                }
+            }
+        }
+
+        if (kingX == -1) return false; // Re non trovato
+
+        String opponentColor = color.equals("white") ? "black" : "white";
+
+        // Verifica se il Re è sotto attacco
+        return board.isSquareAttacked(kingX, kingY, opponentColor);
+    }
+
+    public boolean hasLegalMoves(String color) {
+        if (color == null) return false;
+
+        for (int fromRow = 0; fromRow < 8; fromRow++) {
+            for (int fromCol = 0; fromCol < 8; fromCol++) {
+                Piece piece = board.getPiece(fromRow, fromCol);
+
+                if (!(piece instanceof Null) && piece.color().equals(color)) {
+                    for (int toRow = 0; toRow < 8; toRow++) {
+                        for (int toCol = 0; toCol < 8; toCol++) {
+                            if (fromRow == toRow && fromCol == toCol) continue;
+
+                            if (piece.isValidMove(fromRow, (char) (fromCol + 'a'), toRow, (char) (toCol + 'a'), board)) {
+                                // Se il Re si sposta su una casella attaccata, scarta
+                                if (piece instanceof King &&
+                                        board.isSquareAttacked(toRow, toCol, color.equals("white") ? "black" : "white")) {
+                                    continue;
+                                }
+
+                                // Simula la mossa
+                                Piece captured = board.getPiece(toRow, toCol);
+                                board.setPiece(toRow, toCol, piece);
+                                board.setPiece(fromRow, fromCol, new Null(turnManager));
+
+                                boolean stillInCheck = isInCheck(color);
+
+                                // Ripristina
+                                board.setPiece(fromRow, fromCol, piece);
+                                board.setPiece(toRow, toCol, captured);
+
+                                if (!stillInCheck) return true; // mossa legale trovata
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false; // nessuna mossa legale disponibile
+    }
 
     private boolean hasMoved(int row, int col) {
         Piece piece = board.getPiece(row, col);
@@ -277,6 +247,28 @@ public class Game {
         return moved;
     }
 
+    public void setState(GameState state) {
+        this.state = state;
+        state.handleClick(this, -1, 'a');
+    }
 
+    public GameState getState() {
+        return this.state;
+    }
 
+    public TurnManager getTurnManager() {
+        return turnManager;
+    }
+
+    public boolean hasPiece(int x, int y) {
+        return board.hasPiece(x, y);
+    }
+
+    public boolean isCheckmate(String color) {
+        return isInCheck(color) && !hasLegalMoves(color);
+    }
+
+    public boolean isStalemate(String color) {
+        return !isInCheck(color) && !hasLegalMoves(color);
+    }
 }

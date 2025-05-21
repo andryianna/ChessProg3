@@ -15,4 +15,5 @@ public interface Piece {
      *
      * */
     boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board);
+    boolean canAttack(int startRank, char startFile, int endRank, char endFile, ChessBoard board);
 }

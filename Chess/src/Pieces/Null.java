@@ -15,6 +15,11 @@ public class Null implements Piece{
     }
 
     @Override
+    public boolean canAttack(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
+        return false;
+    }
+
+    @Override
     public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
         return false;
     }

@@ -51,9 +51,7 @@ public class Attack implements ComputerStrategy{
         if (board.getPiece(row,col).isValidMove(row,(char)(col+'a'),toRow,(char)(toCol+'a'),board)){
             game.movePiece(row,(char)(col+'a'),toRow,(char)(toCol+'a'));
         }
-        boolean result = false;
-        if (distance < calculateDistanceToKing((King)(board.findKing(color)),board,row,col))
-            result = true;
+        boolean result = distance < calculateDistanceToKing((King) (board.findKing(color)), board, row, col);
         board.setBoard(backup);
         return result;
     }
@@ -75,9 +73,7 @@ public class Attack implements ComputerStrategy{
         Piece[][] backup = board.getBoard();
         if (board.getPiece(row,col).isValidMove(row,(char)(col+'a'),toRow,(char)(toCol+'a'),board))
             game.movePiece(row,(char)(col+'a'),toRow,(char)(toCol+'a'));
-        boolean result = false;
-        if (distance < calculateDistanceToQueen((Queen)(board.findQueen(color)),board,row,col))
-        result = true;
+        boolean result = distance < calculateDistanceToQueen((Queen) (board.findQueen(color)), board, row, col);
         board.setBoard(backup);
         return result;
     }

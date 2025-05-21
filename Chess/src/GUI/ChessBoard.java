@@ -48,7 +48,7 @@ public class ChessBoard {
             for (int c = 0; c < 8; c++) {
                 Piece attacker = board[r][c];
                 if (!(attacker instanceof Null) && attacker.color().equals(byColor)) {
-                    if (attacker.isValidMove(r, (char)(c + 'a'), row, (char)(col + 'a'), this)) {
+                    if (attacker.canAttack(r, (char)(c + 'a'), row, (char)(col + 'a'), this)) {
                         return true;
                     }
                 }
@@ -56,6 +56,7 @@ public class ChessBoard {
         }
         return false;
     }
+
 
 
 

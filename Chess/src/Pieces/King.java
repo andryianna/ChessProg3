@@ -27,12 +27,17 @@ public class King implements Piece {
     }
 
     @Override
+    public boolean canAttack(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
+        return Math.abs(startRank - endRank) <= 1 && Math.abs(startFile - endFile) <= 1;
+    }
+
+    @Override
     public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
         int rankDiff = Math.abs(endRank - startRank);
         int fileDiff = Math.abs(endCol - startCol);
 
         Piece destinationPiece = board.getPiece(endRank, endCol - 'a');
-        if (rankDiff > 2 || fileDiff > 2) return false;
+        if (rankDiff > 1 || fileDiff > 1) return false;
 
         return destinationPiece instanceof Null || !destinationPiece.color().equals(this.color());
     }

@@ -9,9 +9,15 @@ public record Pawn(String color, int rank, char file) implements Piece {
     }
 
     @Override
-    public boolean isValidMove(int startRank, char startCol, int endRank, char endCol, ChessBoard board) {
-        int startColIndex = startCol - 'a';
-        int endColIndex = endCol - 'a';
+    public boolean canAttack(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
+        int startFileI = startFile - 'a';
+        int endFileI = endFile - 'a';
+        return Math.abs(startRank - endRank) <= 1 && Math.abs(startFileI - endFileI) <= 1;
+    }
+    @Override
+    public boolean isValidMove(int startRank, char startFile, int endRank, char endFile, ChessBoard board) {
+        int startColIndex = startFile - 'a';
+        int endColIndex = endFile - 'a';
         int direction = color.equals("white") ? -1 : 1;
         int rankDiff = endRank - startRank;
         int fileDiff = Math.abs(endColIndex - startColIndex);
