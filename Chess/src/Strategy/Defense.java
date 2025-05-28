@@ -16,14 +16,14 @@ public class Defense implements ComputerStrategy{
      * @param turnManager -Il manager dei turni corrente
      * */
     @Override
-    public boolean chooseMove(Game game, ChessBoard board, String color, TurnManager turnManager){
+    public Move chooseMove(Game game, ChessBoard board, String color, TurnManager turnManager){
         //1. Cattura se puo catturare
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 for (int toRow = 0; toRow < 8; toRow++) {
                     for (int toCol = 0; toCol < 8; toCol++) {
-                        if (isUnderAttack(board,toRow,toCol,color))
-                            return game.movePiece(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
+                        if (board.isUnderAttack(toRow,toCol,color) && game.movePiece(row,(char)(col+'a'),toRow,(char)(toCol+'a')))
+                            return new Move(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
                     }
                 }
             }
@@ -40,15 +40,13 @@ public class Defense implements ComputerStrategy{
                         for (int toCol = 0; toCol < 8; toCol++) {
                             if (piece.isValidMove(row,(char)(col+'a'),toRow,(char)(toCol+'a'),board)
                                 && !isUnderAttackAfterMove(board,game,row,col,toRow,toCol,color))
-                                return game.movePiece(row,(char)(col+'a'),toRow,(char)(toCol+'a'));
+                                return new Move(row, (char)(col + 'a'), toRow, (char)(toCol + 'a')) ;
                         }
                     }
                 }
             }
         }
-        else
-            return makeAMove(game,board,color,turnManager);
-        return false;
+        return makeAMove(board,color);
 
     }
 
@@ -76,7 +74,7 @@ public class Defense implements ComputerStrategy{
         return result;
     }
 
-    public boolean makeAMove(Game game,ChessBoard board, String color, TurnManager turnManager){
+    public Move makeAMove(ChessBoard board, String color){
         for (int fromRow = 0; fromRow < 8; fromRow++) {
             for (int fromCol = 0; fromCol < 8; fromCol++) {
                 Piece piece = board.getPiece(fromRow, fromCol);
@@ -84,15 +82,13 @@ public class Defense implements ComputerStrategy{
                     for (int toRow = 0; toRow < 8; toRow++) {
                         for (int toCol = 0; toCol < 8; toCol++) {
                             if (piece.isValidMove(fromRow, (char)(fromCol + 'a'), toRow, (char)(toCol + 'a'), board)){
-                                game.movePiece(fromRow, (char)(fromCol + 'a'), toRow, (char)(toCol + 'a'));
-                                turnManager.nextTurn();
-                                return true;
+                                return new Move(fromRow, (char)(fromCol + 'a'), toRow, (char)(toCol + 'a'));
                             }
                         }
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 }

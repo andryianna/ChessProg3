@@ -10,9 +10,36 @@ public class ChessBoard {
     private final TurnManager turnManager;
     private int enPassantTargetRow = -1;
     private int enPassantTargetCol = -1;
+    private boolean castledShort = false;
+    private boolean castledLong = false;
+    public void setCastledShort() {
+        this.castledShort = true;
+    }
+    public void setCastledLong() {
+        this.castledLong = true;
+    }
+    public void resetCastled() {
+        this.castledShort = false;
+        this.castledLong = false;
+    }
+    public boolean hasCastledShort() {
+        return castledShort;
+    }
+    public boolean hasCastledLong() {
+        return castledLong;
+    }
+    private Piece promoted;
+    public Piece getPromoted() {
+        return promoted;
+    }
+
+    public void setPromoted(Piece promoted) {
+        this.promoted = promoted;
+    }
 
     public ChessBoard(TurnManager turnManager) {
         this.turnManager = turnManager;
+        this.promoted = new Null(turnManager);
         board = new Piece[8][8];
     }
 
@@ -101,8 +128,19 @@ public class ChessBoard {
         }
         return new Null(turnManager);
     }
-
-
+    public boolean isUnderAttack( int targetRow, int targetCol,String color){
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece attacker = getPiece(row, col);
+                if (!(attacker instanceof Null) && !attacker.color().equals(color)) {
+                    if (attacker.isValidMove(row, (char) (col + 'a'), targetRow, (char) (targetCol + 'a'), this)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     public boolean foundOtherPieceinSameFile(int x,char y, Piece piece) {
         if (piece instanceof Pawn || piece instanceof King) return false;
@@ -127,19 +165,6 @@ public class ChessBoard {
         if (x >= 0 && x < 8 && y >= 0 && y < 8) {
             board[x][y] = piece;
         }
-    }
-
-    public List<Piece> getAllPieces(String color) {
-        List<Piece> pieces = new ArrayList<>();
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                Piece piece = board[row][col];
-                if (!(piece instanceof Null) && piece.color().equals(color)) {
-                    pieces.add(piece);
-                }
-            }
-        }
-        return pieces;
     }
 
     public void setupBoard() {

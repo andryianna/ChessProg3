@@ -10,14 +10,16 @@ import java.util.Random;
 public class Attack implements ComputerStrategy{
 
     @Override
-    public boolean chooseMove(Game game, ChessBoard board, String color, TurnManager turnManager) {
+    public Move chooseMove(Game game, ChessBoard board, String color, TurnManager turnManager) {
         //1. Cattura se puo catturare
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 for (int toRow = 0; toRow < 8; toRow++) {
                     for (int toCol = 0; toCol < 8; toCol++) {
-                        if (isUnderAttack(board,toRow,toCol,color))
-                            return game.movePiece(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
+                        if (board.isUnderAttack(toRow,toCol,color) && board.getPiece(row,col).isValidMove(row,(char)(col+'a'),toRow,(char)(toCol+'a'),board)) {
+                            System.out.println("Cattura!");
+                            return new Move(row, (char) (col + 'a'), toRow, (char) (toCol + 'a'));
+                        }
                     }
                 }
             }
@@ -34,16 +36,16 @@ public class Attack implements ComputerStrategy{
                 for (int toRow = 0; toRow < 8; toRow++) {
                     for (int toCol = 0; toCol < 8; toCol++) {
                         if (strategy <= 70 && simulateMoveKing(row,col,toRow,toCol,distanceToKing,color,board,game)){
-                            return game.movePiece(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
+                            return new Move(row, (char)(col + 'a'), toRow, (char)(toCol + 'a')) ;
                         }
                         else if (simulateMoveQueen(row,col,toRow,toCol,distanceToQueen,color,board,game)){
-                            return game.movePiece(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
+                            return new Move(row, (char)(col + 'a'), toRow, (char)(toCol + 'a'));
                         }
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private boolean simulateMoveKing(int row, int col, int toRow, int toCol,int distance, String color, ChessBoard board,Game game){
@@ -88,19 +90,5 @@ public class Attack implements ComputerStrategy{
             }
         }
         return distance;
-    }
-
-    private boolean isUnderAttack(ChessBoard board, int targetRow, int targetCol,String color){
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                Piece attacker = board.getPiece(row, col);
-                if (!(attacker instanceof Null) && !attacker.color().equals(color)) {
-                    if (attacker.isValidMove(row, (char) (col + 'a'), targetRow, (char) (targetCol + 'a'), board)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 }

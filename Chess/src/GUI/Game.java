@@ -1,19 +1,34 @@
 package GUI;
+
 import Pieces.*;
 import GameState.*;
 import TurnObserver.TurnManager;
+
+import javax.swing.*;
+
+import Strategy.*;
+
+import java.util.Random;
 
 public class Game {
     private final ChessBoard board;
     private GameState state;
     private final TurnManager turnManager;
+    private ComputerStrategy strategy;
 
-    public Game(ChessBoard board, TurnManager turnmanager) {
+    public Game(ChessBoard board, TurnManager turnManager,ComputerStrategy computerStrategy) {
         this.board = board;
         this.state = new NoSelectionState(board);
-        this.turnManager = turnmanager;
+        this.turnManager = turnManager;
+        if (!(computerStrategy instanceof NoStrategy))
+            this.strategy = computerStrategy;
     }
-
+    /**
+     * @param fromX - La riga iniziale della mossa
+     * @param fromY - La colonna iniziale della mossa
+     * @param toX - La riga finale della mossa
+     * @param toY - La colonna finale della mossa
+     * @return la validità della mossa*/
     public boolean movePiece(int fromX, char fromY, int toX, char toY) {
         int fromYIndex = fromY - 'a';
         int toYIndex = toY - 'a';
@@ -31,11 +46,10 @@ public class Game {
                     // Esegui arrocco corto
                     Piece rook = board.getPiece(fromX, 7); // Torre destra
                     board.setPiece(toX, toYIndex, piece); // Sposta il re
-                    board.setPiece(fromX, fromYIndex, new Null(turnManager)); // Elimina il re dalla posizione iniziale
+                    board.setPiece(fromX, fromYIndex, new Pieces.Null(turnManager)); // Elimina il re dalla posizione iniziale
                     board.setPiece(fromX, 5, rook); // Sposta la torre nella posizione corretta
                     board.setPiece(fromX, 7, new Null(turnManager)); // Elimina la torre dalla posizione iniziale
-
-                    turnManager.nextTurn();
+                    board.setCastledShort();
                     return true;
                 }
             // Arrocco lungo
@@ -46,8 +60,7 @@ public class Game {
                     board.setPiece(fromX, fromYIndex, new Null(turnManager)); // Elimina il re dalla posizione iniziale
                     board.setPiece(fromX, 3, rook); // Sposta la torre nella posizione corretta
                     board.setPiece(fromX, 0, new Null(turnManager)); // Elimina la torre dalla posizione iniziale
-
-                    turnManager.nextTurn();
+                    board.setCastledLong();
                     return true;
 
                 }
@@ -93,7 +106,7 @@ public class Game {
         if (piece instanceof Pawn) {
             boolean isPromotionRank = (piece.color().equals("white") && toX == 0) || (piece.color().equals("black") && toX == 7);
             if (isPromotionRank) {
-                Piece promoted = ChessBoardUI.showPromotionDialog(piece.color(), toX, toYIndex);
+                Piece promoted = showPromotionDialog(piece.color(), toX, toYIndex);
                 board.setPiece(toX, toYIndex, promoted);
                 System.out.println("Pedone promosso a " + promoted.getClass().getSimpleName());
             }
@@ -107,12 +120,40 @@ public class Game {
             board.resetEnPassantTarget();
         }
 
-        turnManager.nextTurn();
         System.out.println("Mossa valida!" + (isEnPassant ? " (en passant)" : ""));
         evaluateStateAfterMove(piece.color());
         return true;
     }
+    /**
+     * @param color - Il colore del pedone
+     * @param rank - La riga del pedone
+     * @param file - La colonna del pedone
+     * @return il pedone promosso
+     * Mostra una finestra di dialogo per la selezione della promozione del pedone
+     * */
+    private Piece showPromotionDialog(String color, int rank, int file) {
+        String[] options = { "Regina", "Torre", "Alfiere", "Cavallo" };
+        String choice = (String) JOptionPane.showInputDialog(
+                null,
+                "Scegli il pezzo per la promozione:",
+                "Promozione del Pedone",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]);
+        Piece promoted = switch (choice) {
+            case "Torre" -> new Rook(color, rank, (char) (file + 'a'));
+            case "Alfiere" -> new Bishop(color, rank, (char) (file + 'a'));
+            case "Cavallo" -> new Knight(color, rank, (char) (file + 'a'));
+            default -> new Queen(color, rank, (char) (file + 'a'));
+        };
+        board.setPromoted(promoted);
+        return promoted;
+    }
 
+    /**
+     * Restituisce la validità mossa valida del pezzo selezionato
+     */
     public boolean isValidMove(int fromX, char fromY, int toX, char toY,ChessBoard chessBoard) {
         int indexFromY = fromY - 'a';
         Piece piece = chessBoard.getPiece(fromX, indexFromY);
@@ -120,6 +161,8 @@ public class Game {
         return piece.isValidMove(fromX, fromY, toX, toY, board);
     }
 
+    /**
+     * Restituisce la validità dell arrocco selezionato*/
     private boolean isCastlingPossible(int fromX, int fromY, int toX, int toY, String color) {
         System.out.println("Verifica arrocco per il colore: " + color + " dal " + fromY + fromX + " a " + toY + toX);
 
@@ -160,6 +203,9 @@ public class Game {
         return true;
     }
 
+    /**
+     * @param currentPlayerColor - Il colore del giocatore corrente
+     * Calcola lo stato del gioco dopo la mossa selezionata*/
     public void evaluateStateAfterMove(String currentPlayerColor) {
         String opponentColor = currentPlayerColor.equals("white") ? "black" : "white";
 
@@ -175,7 +221,9 @@ public class Game {
             setState(new NoSelectionState(board));
         }
 
-
+    /**
+     * @param color - Il colore del re da controllare
+     * @return vero se il re é sotto scacco, falso altrimenti*/
     public boolean isInCheck(String color) {
         int kingX = -1, kingY = -1;
 
@@ -199,6 +247,9 @@ public class Game {
         return board.isSquareAttacked(kingX, kingY, opponentColor);
     }
 
+    /**
+     * @param color Il colore da controllare
+     * @return vero se il colore ha almeno una mossa legale, falso altrimenti*/
     public boolean hasLegalMoves(String color) {
         if (color == null) return false;
 
@@ -240,6 +291,15 @@ public class Game {
         return false; // nessuna mossa legale disponibile
     }
 
+    public void makeComputerMove() {
+        Move move = strategy.chooseMove(this,board,turnManager.getCurrentTurn(),turnManager);
+        if(movePiece(move.fromX(),move.fromY(),move.toX(),move.toY())) {
+            System.out.println("Mossa effettuata dalla strategia: " + move);
+        }
+    }
+
+    /**
+     * @return vero se il re o la torre sono stati mossi, falso altrimenti*/
     private boolean hasMoved(int row, int col) {
         Piece piece = board.getPiece(row, col);
         boolean moved = piece instanceof King ? ((King) piece).hasMoved() : piece instanceof Rook && ((Rook) piece).hasMoved();
@@ -247,15 +307,30 @@ public class Game {
         return moved;
     }
 
+    /**
+     * Imposta lo stato del gioco*/
     public void setState(GameState state) {
         this.state = state;
         state.handleClick(this, -1, 'a');
     }
 
+    /**
+     * @param strategy - La strategia da impostare
+     * Imposta la strategia del computer*/
+    protected void setStrategy(String strategy) {
+        switch (strategy) {
+            case "Attack" -> this.strategy = new Attack();
+            case "Defense" -> this.strategy = new Defense();
+            default -> this.strategy = new NoStrategy();
+        }
+    }
+    /**
+     * @return lo stato di gioco corrente*/
     public GameState getState() {
         return this.state;
     }
-
+    /**
+     * @return il turnManager usato*/
     public TurnManager getTurnManager() {
         return turnManager;
     }
@@ -263,11 +338,14 @@ public class Game {
     public boolean hasPiece(int x, int y) {
         return board.hasPiece(x, y);
     }
-
+    /**
+     * @return vero se scacco matto, falso altrimenti*/
     public boolean isCheckmate(String color) {
         return isInCheck(color) && !hasLegalMoves(color);
     }
 
+    /**
+     * @return vero se stallo(non é in scacco e non ha mosse legali), falso altrimenti*/
     public boolean isStalemate(String color) {
         return !isInCheck(color) && !hasLegalMoves(color);
     }

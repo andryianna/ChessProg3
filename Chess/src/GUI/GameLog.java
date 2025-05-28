@@ -2,8 +2,7 @@ package GUI;
 
 import GameState.CheckState;
 import GameState.CheckmateState;
-import Pieces.Pawn;
-import Pieces.Piece;
+import Pieces.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -41,29 +40,8 @@ public class GameLog {
      */
 
     public String getAlgebraicNotation(ChessBoard board,Piece piece, int pieceCount,int fromX, char fromY, int toX, char toY) {
-        String move = getPieceSymbol(piece);
-        System.out.println("Mossa: " + move);
-        /// Se trovo un altro pezzo nella stessa riga o colonna aggiungo riga o colonna di partenza
-        if (board.foundOtherPieceinSameFile(fromX,fromY,piece))
-            move += fromX;
-        else if (board.foundOtherPieceinSameRank(fromX,fromY,piece))
-            move += fromY;
-        /// Se la scacchiera ha un pezzo in meno rispetto a prima, la mossa é una cattura
-        else if (board.piecesCount() + 1 == pieceCount)
-            move += "x";
-        /// Altrimenti prendo solo casella di destinazione
-        else
-            move += toX + toY;
-        if (((Pawn) piece).promoted())
-        /// Se il re avversario viene messo sotto scacco aggiungi il +
-        if (game.getState() instanceof CheckState)
-            move += "+";
-
-        /// Se il gioco finisce con scacco matto aggiungi # invece di +
-        if (game.getState() instanceof CheckmateState)
-            move += "#";
-
-        return move;
+        Move move = new Move(fromX, fromY, toX, toY);
+        return move.toAlgebraicNotation(game,board,piece,board.piecesCount() + 1 == pieceCount,board.getPromoted());
     }
     public void addMove(ChessBoard board, Piece piece, int fromX, char fromY, int toX, char toY, int pieceCount) {
         String move = getAlgebraicNotation(board,piece,pieceCount,fromX,fromY,toX,toY);
@@ -84,16 +62,6 @@ public class GameLog {
 
     }
 
-    private String getPieceSymbol(Piece piece) {
-        return switch (piece.getClass().getSimpleName()) {
-            case "Knight" -> "N";
-            case "Bishop" -> "B";
-            case "Rook" -> "R";
-            case "Queen" -> "Q";
-            case "King" -> "K";
-            default -> "";
-        };
-    }
     /**
      * Salva il log delle mosse e l’intestazione in un file .pgn
      */

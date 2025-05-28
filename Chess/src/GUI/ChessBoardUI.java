@@ -11,17 +11,19 @@ import java.io.File;
 
 import GameState.*;
 import Pieces.*;
+import Strategy.*;
 import TurnObserver.*;
 
 public class ChessBoardUI extends JFrame implements TurnObserver {
     private final TurnManager turnManager = new TurnManager();
     private final ChessBoard chessBoard = new ChessBoard(turnManager);
-    private final Game game = new Game(chessBoard,turnManager);
+    private final Game game = new Game(chessBoard,turnManager,new Defense());
     private final GameLog gameLog = new GameLog(game,"log.pgn");
-    private final JLabel turnLabel;
-    private final JButton[][] boardButtons;
-    private String currentTurn = "white";
+    private final JLabel turnLabel = new JLabel("Turno del Bianco", SwingConstants.CENTER);
+    private final JButton[][] boardButtons = new JButton[8][8];
+    private final JComboBox<String> strategies = new JComboBox<>(new String[]{"Attack", "Defense"});
 
+    private String currentTurn = "white";
     private int selectedPieceX;
     private char selectedPieceY;
 
@@ -33,80 +35,11 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        setSize(650, 650);
+        setSize(840,640);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Label per il turno
-        turnLabel = new JLabel("Turno del Bianco", SwingConstants.CENTER);
-        JButton againButton = new JButton("Nuova partita");
-        againButton.addActionListener(e -> {
-            JFrame frame = new ChessBoardUI();
-            frame.setVisible(true);
-        });
-        add(againButton, BorderLayout.SOUTH);
-        add(turnLabel, BorderLayout.NORTH);
-
-        // Pannello principale con le coordinate
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Pannello per la scacchiera con le coordinate
-        JPanel boardPanel = new JPanel(new GridBagLayout());
-        boardButtons = new JButton[8][8];
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(2, 2, 2, 2);
-
-        // Aggiungi numeri sulla sinistra e sulla destra
-        for (int row = 0; row < 8; row++) {
-            JLabel leftLabel = new JLabel(String.valueOf(8 - row), SwingConstants.CENTER);
-            leftLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            gbc.gridx = 0;
-            gbc.gridy = row + 1;
-            boardPanel.add(leftLabel, gbc);
-
-            JLabel rightLabel = new JLabel(String.valueOf(8 - row), SwingConstants.CENTER);
-            rightLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            gbc.gridx = 9;
-            gbc.gridy = row + 1;
-            boardPanel.add(rightLabel, gbc);
-        }
-
-        // Aggiungi le lettere sopra e sotto
-        for (int col = 0; col < 8; col++) {
-            JLabel topLabel = new JLabel(String.valueOf((char) ('a' + col)), SwingConstants.CENTER);
-            topLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            gbc.gridx = col + 1;
-            gbc.gridy = 0;
-            boardPanel.add(topLabel, gbc);
-
-            JLabel bottomLabel = new JLabel(String.valueOf((char) ('a' + col)), SwingConstants.CENTER);
-            bottomLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            gbc.gridx = col + 1;
-            gbc.gridy = 9;
-            boardPanel.add(bottomLabel, gbc);
-        }
-
-        // Aggiungi bottoni della scacchiera
-        for (int row = 0; row < 8; row++) { 
-            for (int col = 0; col < 8; col++) {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(60, 60));
-                button.setBackground((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
-
-                button.addMouseListener(listener(row, col,button));
-
-                boardButtons[row][col] = button;
-                gbc.gridx = col + 1;
-                gbc.gridy = row + 1;
-                boardPanel.add(button, gbc);
-            }
-        }
-
-        mainPanel.add(boardPanel, BorderLayout.CENTER);
-        add(mainPanel, BorderLayout.CENTER);
-
-        setupBoard();
+        initializeUI();
     }
 
     public void renderPieces() {
@@ -165,6 +98,9 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
                             repaintBoard();
                             //System.out.println(gameLog.getAlgebraicNotation(chessBoard,selectedPiece,pieceCount,selectedPieceX,selectedPieceY,finalRow,(char)(finalCol+'a')));
                             game.setState(new NoSelectionState(chessBoard));
+                            turnManager.nextTurn();
+                            game.makeComputerMove();
+                            turnManager.nextTurn();
                             renderPieces();
                         }
                     }
@@ -205,25 +141,94 @@ public class ChessBoardUI extends JFrame implements TurnObserver {
         return new ImageIcon(scaled);
     }
 
-    public static Piece showPromotionDialog(String color, int rank, int file) {
-        String[] options = { "Regina", "Torre", "Alfiere", "Cavallo" };
-        String choice = (String) JOptionPane.showInputDialog(
-                null,
-                "Scegli il pezzo per la promozione:",
-                "Promozione del Pedone",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                options,
-                options[0]);
 
-        if (choice == null) choice = "Queen"; // default
 
-        return switch (choice) {
-            case "Torre" -> new Rook(color, rank, (char) (file + 'a'));
-            case "Alfiere" -> new Bishop(color, rank, (char) (file + 'a'));
-            case "Cavallo" -> new Knight(color, rank, (char) (file + 'a'));
-            default -> new Queen(color, rank, (char) (file + 'a'));
-        };
+    private void initializeUI(){
+        // Label per il turno
+        JButton againButton = new JButton("Nuova partita");
+        againButton.addActionListener(e -> {
+            JFrame frame = new ChessBoardUI();
+            frame.setVisible(true);
+        });
+        add(againButton, BorderLayout.SOUTH);
+        add(turnLabel, BorderLayout.NORTH);
+
+        // Pannello principale con le coordinate
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Pannello per la scacchiera con le coordinate
+        JPanel boardPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+
+        // Aggiungi numeri sulla sinistra e sulla destra
+        for (int row = 0; row < 8; row++) {
+            JLabel leftLabel = new JLabel(String.valueOf(8 - row), SwingConstants.CENTER);
+            leftLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            gbc.gridx = 0;
+            gbc.gridy = row + 1;
+            boardPanel.add(leftLabel, gbc);
+
+            JLabel rightLabel = new JLabel(String.valueOf(8 - row), SwingConstants.CENTER);
+            rightLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            gbc.gridx = 9;
+            gbc.gridy = row + 1;
+            boardPanel.add(rightLabel, gbc);
+        }
+
+        // Aggiungi le lettere sopra e sotto
+        for (int col = 0; col < 8; col++) {
+            JLabel topLabel = new JLabel(String.valueOf((char) ('a' + col)), SwingConstants.CENTER);
+            topLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            gbc.gridx = col + 1;
+            gbc.gridy = 0;
+            boardPanel.add(topLabel, gbc);
+
+            JLabel bottomLabel = new JLabel(String.valueOf((char) ('a' + col)), SwingConstants.CENTER);
+            bottomLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            gbc.gridx = col + 1;
+            gbc.gridy = 9;
+            boardPanel.add(bottomLabel, gbc);
+        }
+
+        JTextArea moveHistory = new JTextArea(20, 15);
+        moveHistory.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(moveHistory);
+
+        JPanel historyPanel = new JPanel(new BorderLayout());
+        historyPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Aggiungi bottoni della scacchiera
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(60, 60));
+                button.setBackground((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
+
+                button.addMouseListener(listener(row, col,button));
+
+                boardButtons[row][col] = button;
+                gbc.gridx = col + 1;
+                gbc.gridy = row + 1;
+                boardPanel.add(button, gbc);
+            }
+        }
+
+        JPanel chooseStrategyPanel = new JPanel(new BorderLayout());
+        strategies.addActionListener(e -> {game.setStrategy((String)strategies.getSelectedItem());});
+        chooseStrategyPanel.add(strategies,BorderLayout.CENTER);
+
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(chooseStrategyPanel, BorderLayout.NORTH);
+        rightPanel.add(scrollPane, BorderLayout.SOUTH);
+        JPanel main = new JPanel(new BorderLayout());
+        mainPanel.add(boardPanel, BorderLayout.CENTER);
+        main.add(mainPanel, BorderLayout.CENTER);
+        main.add(rightPanel, BorderLayout.EAST);
+        add(main, BorderLayout.CENTER);
+
+        setupBoard();
     }
 
     public static void main(String[] args) {
